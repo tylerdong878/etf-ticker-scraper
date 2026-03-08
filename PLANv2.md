@@ -28,9 +28,13 @@ etf-monitor/
 │   │   └── models.py                 # Data models
 │   └── main.py                       # Orchestration
 ├── data/
-│   ├── snapshots/                    # JSON snapshots per run
+│   ├── snapshots/                    # Daily JSON snapshots (git-tracked)
+│   │   ├── 2026-03-03.json
+│   │   ├── 2026-03-04.json
 │   │   ├── 2026-03-08.json
 │   │   └── latest.json               # Symlink to most recent
+│   ├── changelog/                    # Weekly change logs
+│   │   └── 2026-W10.json            # Week-by-week activity
 │   └── logs/
 ├── tests/
 ├── .github/
@@ -77,33 +81,85 @@ ISSUERS = {
 ## Data Flow
 
 ```
-1. SCRAPE
+1. SCRAPE (daily, weekdays)
    ├── stockanalysis.com/etf/provider/{issuer}/ × 14 issuers
    │   → Parse HTML table: ticker, name, AUM, div yield, expense ratio, 1Y return
    └── BMO custom scraper (etfdb.com or bmogam.com)
        → Parse BMO fund list
 
-2. ENRICH (optional, via yfinance)
+2. ENRICH (daily, after scrape)
    → For each ticker: NAV, volume, inception date, sector
    → Rate limited: ~2 req/sec, cached to avoid redundant calls
 
-3. COMPARE
-   ├── Load previous snapshot (data/snapshots/latest.json)
-   ├── Diff current vs previous per issuer:
+3. SAVE SNAPSHOT (daily)
+   └── Write to data/snapshots/{date}.json
+   └── Git commit + push (version-controlled history)
+
+3b. DAILY CHANGE LOG (daily, after save)
+   ├── Compare today's snapshot vs yesterday's
+   ├── Append any changes to data/changelog/{week}.json:
+   │   {
+   │     "date": "2026-03-04",
+   │     "launches": [{"ticker": "TRIL", "issuer": "defiance", "name": "..."}],
+   │     "closures": [],
+   │     "aum_changes": [{"ticker": "MSTX", "prev": 300M, "current": 280M}]
+   │   }
+   └── This changelog powers the weekly timeline in the email report
+
+4. COMPARE (weekly, Mondays)
+   ├── Load Monday snapshot + previous Monday snapshot
+   ├── Diff per issuer:
    │   ├── NEW tickers     → flag as "Launch"
    │   ├── MISSING tickers → flag as "Closure/Delist"
-   │   └── CHANGED AUM     → track growth/decline
-   └── Save current as new snapshot
+   │   └── CHANGED AUM     → track growth/decline (week-over-week)
+   └── Also check: any ticker missing for 2+ consecutive daily snapshots
+        before confirming closure (avoids false positives from scrape errors)
 
-4. REPORT
+5. REPORT (weekly, Mondays)
    ├── Generate HTML email via Jinja2 template
-   │   ├── Section 1: 🚀 New Launches & ❌ Closures (highlighted)
-   │   ├── Section 2: Issuer Summary Table (funds count, total AUM, changes)
-   │   └── Section 3: Full Fund List by Issuer (sortable)
+   │   │
+   │   ├── Section 1: WEEKLY ACTIVITY LOG
+   │   │   Timeline view of what happened each day:
+   │   │   ├── "Tue 3/3: Defiance launched TRIL (Trillion Dollar Club Index ETF)"
+   │   │   ├── "Wed 3/4: Tuttle launched UFOD (UFO Disclosure ETF)"
+   │   │   ├── "Thu 3/5: REX closed RXYZ (delisted)"
+   │   │   └── Shows exact day each change was detected, not just a weekly dump
+   │   │
+   │   ├── Section 2: NEW LAUNCHES (detail cards)
+   │   │   For each new fund launched this week:
+   │   │   ├── Ticker, full name, issuer
+   │   │   ├── Expense ratio, category/strategy
+   │   │   ├── AUM at end of first week (early traction signal)
+   │   │   └── Link to stockanalysis.com page
+   │   │
+   │   ├── Section 3: CLOSURES & DELISTINGS
+   │   │   For each fund removed this week:
+   │   │   ├── Ticker, name, issuer
+   │   │   ├── Last known AUM before closure
+   │   │   └── How long it was active (inception → closure)
+   │   │
+   │   ├── Section 4: ISSUER SCOREBOARD
+   │   │   Table comparing all 15 issuers:
+   │   │   ├── Issuer | # Funds | Total AUM | WoW AUM Δ | WoW AUM Δ% | New | Closed
+   │   │   ├── Sorted by total AUM descending
+   │   │   └── Color-coded: green for growth, red for decline
+   │   │
+   │   ├── Section 5: AUM MOVERS
+   │   │   ├── Top 10 funds by AUM gained this week ($)
+   │   │   ├── Top 10 funds by AUM lost this week ($)
+   │   │   └── Helps spot which products are gaining traction or bleeding out
+   │   │
+   │   ├── Section 6: FUND COUNT CHANGES
+   │   │   ├── Which issuers added the most funds this week
+   │   │   ├── Which issuers closed the most funds
+   │   │   └── Running total trend (e.g. "Defiance: 60 → 62 funds, +2 this week")
+   │   │
+   │   └── Section 7: FULL FUND LIST (attachment or expandable)
+   │       ├── Every fund across all 15 issuers
+   │       ├── Grouped by issuer, sorted by AUM within each group
+   │       └── Columns: Ticker | Name | AUM | Exp Ratio | Div Yield | 1Y Return
+   │
    └── Send via Gmail SMTP
-
-5. SAVE
-   └── Write snapshot to data/snapshots/{date}.json
 ```
 
 ---
@@ -211,12 +267,24 @@ ISSUERS = {
 - [ ] Test email rendering in Gmail, Outlook, Apple Mail
 
 ### Phase 6: Automation (Days 11-12)
-- [ ] Create GitHub Actions workflow
-  - Cron: `0 10 * * 1-5` (6 AM ET, weekdays)
-  - Install Playwright browsers in CI
-  - Store secrets: GMAIL_USER, GMAIL_APP_PASSWORD, RECIPIENT_EMAIL
-- [ ] Test dry run in Actions
-- [ ] Add error notification (email on failure)
+- [ ] Create TWO GitHub Actions workflows:
+  1. **Daily scrape** (`daily_scrape.yml`)
+     - Cron: `0 10 * * 1-5` (6 AM ET, weekdays)
+     - Scrape all issuers → enrich with yfinance → save snapshot
+     - Compare with yesterday's snapshot → append to weekly changelog
+     - Commit snapshot to repo (data/snapshots/{date}.json)
+     - No email sent
+  2. **Weekly report** (`weekly_report.yml`)
+     - Cron: `0 11 * * 1` (7 AM ET, Mondays only)
+     - Triggered AFTER daily scrape completes
+     - Loads current snapshot + snapshot from 7 days ago
+     - Reads weekly changelog for day-by-day timeline
+     - Generates weekly diff (all launches/closures from the past week)
+     - Sends email report
+- [ ] Install Playwright browsers in CI
+- [ ] Store secrets: GMAIL_USER, GMAIL_APP_PASSWORD, RECIPIENT_EMAIL
+- [ ] Test dry runs for both workflows
+- [ ] Add error notification (email on scrape failure)
 - [ ] Monitor first few live runs
 
 ---
