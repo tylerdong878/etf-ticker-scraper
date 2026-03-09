@@ -15,7 +15,7 @@ from .detection.snapshot_manager import (
 )
 from .detection.change_detector import detect_changes, append_to_changelog, load_weekly_changelog
 from .enrichment.yahoo_finance import enrich_funds
-from .reporting.email_service import generate_report, send_email, save_report_locally
+from .reporting.email_service import generate_report, send_email, save_report_locally, generate_pdf
 from .utils.models import DailySnapshot, IssuerSnapshot
 from .utils.config import (
     ENRICH_WITH_YFINANCE, SEND_EMAIL, DRY_RUN, REPORT_FREQUENCY
@@ -255,11 +255,16 @@ def report_mode(dry_run: bool = False) -> None:
         
         logger.info(f"Loaded changelog for week {week_str}: {len(changelog)} entries")
         
-        # Step 4: Generate HTML report
-        html_content = generate_report(current_snapshot, previous_snapshot, changelog)
+        # Step 4: Generate full HTML report for local save
+        full_html_content = generate_report(
+            current_snapshot,
+            previous_snapshot,
+            changelog,
+            is_email_body=False
+        )
         
-        # Step 5: Save report locally (always)
-        save_report_locally(html_content, current_snapshot.date)
+        # Step 5: Save full report locally (always)
+        save_report_locally(full_html_content, current_snapshot.date)
         
         # Step 6: Send email if enabled and not dry-run
         if SEND_EMAIL and not dry_run and not DRY_RUN:
@@ -267,7 +272,7 @@ def report_mode(dry_run: bool = False) -> None:
             if report_type == "daily":
                 subject = f"Daily ETF Update - {current_snapshot.date}"
             
-            success = send_email(html_content, subject)
+            success = send_email(current_snapshot, previous_snapshot, changelog, subject)
             if success:
                 logger.info("Report email sent successfully")
             else:

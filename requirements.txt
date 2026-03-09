@@ -4,3 +4,4 @@ yfinance
 pandas
 jinja2
 python-dotenv
+weasyprint

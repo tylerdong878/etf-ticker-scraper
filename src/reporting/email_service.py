@@ -1,15 +1,18 @@
 """
 Email reporting service for ETF ticker scraper.
-Generates HTML reports and sends them via Gmail SMTP.
+Generates HTML reports and sends them via Gmail SMTP with PDF attachment.
 """
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+from io import BytesIO
 
 from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML
 
 from ..utils.models import DailySnapshot
 from ..utils.config import (
@@ -74,7 +77,8 @@ def _merge_rex_issuers(scoreboard: list[dict]) -> list[dict]:
 def generate_report(
     current_snapshot: DailySnapshot,
     previous_snapshot: Optional[DailySnapshot],
-    changelog: list[dict]
+    changelog: list[dict],
+    is_email_body: bool = False
 ) -> str:
     """
     Generate HTML report from snapshots and changelog data.
@@ -83,6 +87,7 @@ def generate_report(
         current_snapshot: Current day's snapshot
         previous_snapshot: Previous snapshot for comparison (can be None for first run)
         changelog: List of daily change entries for the week
+        is_email_body: If True, excludes Full Fund List section for email body
     
     Returns:
         HTML string of the generated report
@@ -212,19 +217,51 @@ def generate_report(
         top_losers=top_losers,
         fund_count_changes=fund_count_changes,
         fund_list=fund_list,
-        generation_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+        generation_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
+        is_email_body=is_email_body
     )
     
     logger.info("Report generated successfully")
     return html_content
 
 
-def send_email(html_content: str, subject: str) -> bool:
+def generate_pdf(html_content: str) -> bytes:
     """
-    Send HTML email via Gmail SMTP.
+    Convert HTML content to PDF bytes.
     
     Args:
-        html_content: HTML content of the email
+        html_content: HTML string to convert
+    
+    Returns:
+        PDF file as bytes
+    """
+    try:
+        # Create PDF from HTML string
+        pdf_file = BytesIO()
+        HTML(string=html_content).write_pdf(pdf_file)
+        pdf_bytes = pdf_file.getvalue()
+        
+        logger.info(f"Generated PDF: {len(pdf_bytes)} bytes")
+        return pdf_bytes
+        
+    except Exception as e:
+        logger.error(f"Failed to generate PDF: {e}")
+        raise
+
+
+def send_email(
+    current_snapshot: DailySnapshot,
+    previous_snapshot: Optional[DailySnapshot],
+    changelog: list[dict],
+    subject: str
+) -> bool:
+    """
+    Send email with executive summary HTML body and full report PDF attachment.
+    
+    Args:
+        current_snapshot: Current day's snapshot
+        previous_snapshot: Previous snapshot for comparison
+        changelog: List of daily change entries
         subject: Email subject line
     
     Returns:
@@ -235,15 +272,45 @@ def send_email(html_content: str, subject: str) -> bool:
         return False
     
     try:
-        # Create message
-        msg = MIMEMultipart('alternative')
+        # Generate email body (executive summary without full fund list)
+        logger.info("Generating executive summary for email body...")
+        email_body_html = generate_report(
+            current_snapshot,
+            previous_snapshot,
+            changelog,
+            is_email_body=True
+        )
+        
+        # Generate full report HTML for PDF
+        logger.info("Generating full report for PDF attachment...")
+        full_report_html = generate_report(
+            current_snapshot,
+            previous_snapshot,
+            changelog,
+            is_email_body=False
+        )
+        
+        # Convert full report to PDF
+        logger.info("Converting full report to PDF...")
+        pdf_bytes = generate_pdf(full_report_html)
+        
+        # Create multipart message
+        msg = MIMEMultipart('mixed')
         msg['Subject'] = subject
         msg['From'] = GMAIL_USER
         msg['To'] = RECIPIENT_EMAIL
         
-        # Attach HTML content
-        html_part = MIMEText(html_content, 'html')
+        # Attach email body HTML
+        html_part = MIMEText(email_body_html, 'html')
         msg.attach(html_part)
+        
+        # Attach PDF
+        pdf_filename = f"ETF_Report_{current_snapshot.date}.pdf"
+        pdf_attachment = MIMEApplication(pdf_bytes, _subtype='pdf')
+        pdf_attachment.add_header('Content-Disposition', 'attachment', filename=pdf_filename)
+        msg.attach(pdf_attachment)
+        
+        logger.info(f"Email prepared with PDF attachment: {pdf_filename}")
         
         # Connect to Gmail SMTP server
         logger.info(f"Connecting to Gmail SMTP server...")
@@ -261,19 +328,25 @@ def send_email(html_content: str, subject: str) -> bool:
 
 def save_report_locally(html_content: str, date: str) -> None:
     """
-    Save HTML report to local file system.
+    Save HTML and PDF reports to local file system.
     
     Args:
         html_content: HTML content to save
         date: Date string in format "YYYY-MM-DD"
     """
     try:
-        filepath = REPORTS_DIR / f"report_{date}.html"
-        
-        with open(filepath, 'w', encoding='utf-8') as f:
+        # Save HTML file
+        html_filepath = REPORTS_DIR / f"report_{date}.html"
+        with open(html_filepath, 'w', encoding='utf-8') as f:
             f.write(html_content)
+        logger.info(f"HTML report saved to {html_filepath}")
         
-        logger.info(f"Report saved locally to {filepath}")
+        # Save PDF file
+        pdf_filepath = REPORTS_DIR / f"report_{date}.pdf"
+        pdf_bytes = generate_pdf(html_content)
+        with open(pdf_filepath, 'wb') as f:
+            f.write(pdf_bytes)
+        logger.info(f"PDF report saved to {pdf_filepath}")
         
     except Exception as e:
         logger.error(f"Failed to save report locally: {e}")
