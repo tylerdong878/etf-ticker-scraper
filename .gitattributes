@@ -1,2 +1,3 @@
 data/** linguist-generated=true
 tests/** linguist-documentation=true
+src/reporting/templates/** linguist-detectable=false
