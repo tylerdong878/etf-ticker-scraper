@@ -12,9 +12,10 @@ load_dotenv()
 # Base project directory
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Issuer configuration - maps issuer slug to stockanalysis.com URL
-ISSUERS = {
-    # 14 issuers via stockanalysis.com
+# Issuer configuration - organized by scraping method
+
+# Issuers available on stockanalysis.com (11 issuers)
+STOCKANALYSIS_ISSUERS = {
     "proshares": "https://stockanalysis.com/etf/provider/proshares/",
     "direxion": "https://stockanalysis.com/etf/provider/direxion/",
     "graniteshares": "https://stockanalysis.com/etf/provider/graniteshares/",
@@ -22,18 +23,28 @@ ISSUERS = {
     "neos": "https://stockanalysis.com/etf/provider/neos/",
     "roundhill": "https://stockanalysis.com/etf/provider/roundhill/",
     "rex-microsectors": "https://stockanalysis.com/etf/provider/rex-microsectors/",
-    "rex-shares": "https://stockanalysis.com/etf/provider/rex-shares/",
     "tuttle-capital-management": "https://stockanalysis.com/etf/provider/tuttle-capital-management/",
     "defiance": "https://stockanalysis.com/etf/provider/defiance/",
     "simplify": "https://stockanalysis.com/etf/provider/simplify/",
-    "volatility-shares": "https://stockanalysis.com/etf/provider/volatility-shares/",
     "tradr": "https://stockanalysis.com/etf/provider/tradr/",
-    "leverage-shares": "https://stockanalysis.com/etf/provider/leverage-shares/",
-    "kurv": "https://stockanalysis.com/etf/provider/kurv/",
-    
-    # BMO handled separately with custom scraper
-    "bmo": "CUSTOM_SCRAPER"
 }
+
+# Issuers scraped from their own websites (4 issuers)
+DIRECT_ISSUERS = {
+    "kurv": "https://www.kurvinvest.com/etfs",
+    "volatility-shares": "https://www.volatilityshares.com/etf-product-list.php",
+    "rex-shares": "https://www.rexshares.com/home/all-funds/",
+    "leverage-shares": "https://leverageshares.com/us/all-etfs/",
+}
+
+# New launches page on stockanalysis.com
+NEW_LAUNCHES_URL = "https://stockanalysis.com/etf/list/new/"
+
+# Deferred issuers (blocked or require special handling)
+BMO_DEFERRED = "https://www.bmogam.com/ca-en/products/exchange-traded-funds/"
+
+# Combined issuers dictionary for backward compatibility
+ISSUERS = {**STOCKANALYSIS_ISSUERS, **DIRECT_ISSUERS}
 
 # Scraping settings
 SCRAPE_DELAY_MIN = int(os.getenv("SCRAPE_DELAY_MIN", "2"))
