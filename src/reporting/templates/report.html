@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETF Ticker Scraper Report - {{ report_date }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3b82f6;
+        }
+        
+        .timeline {
+            border-left: 3px solid #3b82f6;
+            padding-left: 20px;
+            margin-left: 10px;
+        }
+        
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+        
+        .timeline-date {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .card-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .card-meta strong {
+            color: #333;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+        
+        th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .positive {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        .neutral {
+            color: #6b7280;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .badge-info {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .issuer-group {
+            margin-bottom: 30px;
+        }
+        
+        .issuer-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px 16px;
+            font-weight: 700;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .fund-list {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 0 0 4px 4px;
+        }
+        
+        .fund-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .fund-item:last-child {
+            border-bottom: none;
+        }
+        
+        .fund-ticker {
+            font-weight: 700;
+            color: #1e3a8a;
+            min-width: 80px;
+        }
+        
+        .fund-name {
+            flex: 1;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .fund-aum {
+            color: #666;
+            font-size: 13px;
+            text-align: right;
+            min-width: 120px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+            font-style: italic;
+        }
+        
+        .footer {
+            background: #f8fafc;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .section {
+                padding: 16px;
+            }
+            
+            .section-title {
+                font-size: 20px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+            
+            .fund-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .fund-aum {
+                margin-top: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 ETF Ticker Scraper Report</h1>
+            <p>{{ report_date }} | Week {{ week_number }}</p>
+        </div>
+        
+        <div class="content">
+            <!-- Section 1: Weekly Activity Log -->
+            <div class="section">
+                <h2 class="section-title">📅 Weekly Activity Log</h2>
+                {% if weekly_timeline %}
+                    <div class="timeline">
+                        {% for day in weekly_timeline %}
+                        <div class="timeline-item">
+                            <div class="timeline-date">{{ day.date }}</div>
+                            <div class="timeline-content">
+                                {{ day.launches }} launches, {{ day.closures }} closures, {{ day.aum_changes }} AUM changes
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">No activity recorded this week</div>
+                {% endif %}
+            </div>
+            
+            <!-- Section 2: New Launches -->
+            <div class="section">
+                <h2 class="section-title">🚀 New Launches</h2>
+                {% if launches %}
+                    {% for launch in launches %}
+                    <div class="card">
+                        <div class="card-title">{{ launch.ticker }}</div>
+                        <div class="card-meta"><strong>Name:</strong> {{ launch.name }}</div>
+                        <div class="card-meta"><strong>Issuer:</strong> {{ launch.issuer }}</div>
+                        <div class="card-meta"><strong>Launch Date:</strong> {{ launch.date }}</div>
+                        {% if launch.aum %}
+                        <div class="card-meta"><strong>Initial AUM:</strong> ${{ "{:,.0f}".format(launch.aum) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No new launches this week</div>
+                {% endif %}
+            </div>
+            
+            <!-- Section 3: Closures & Delistings -->
+            <div class="section">
+                <h2 class="section-title">🔻 Closures & Delistings</h2>
+                {% if closures %}
+                    {% for closure in closures %}
+                    <div class="card">
+                        <div class="card-title">{{ closure.ticker }}</div>
+                        <div class="card-meta"><strong>Name:</strong> {{ closure.name }}</div>
+                        <div class="card-meta"><strong>Issuer:</strong> {{ closure.issuer }}</div>
+                        <div class="card-meta"><strong>Closure Date:</strong> {{ closure.date }}</div>
+                        {% if closure.last_aum %}
+                        <div class="card-meta"><strong>Last AUM:</strong> ${{ "{:,.0f}".format(closure.last_aum) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No closures this week</div>
+                {% endif %}
+            </div>
+            
+            <!-- Section 4: Issuer Scoreboard -->
+            <div class="section">
+                <h2 class="section-title">🏆 Issuer Scoreboard</h2>
+                {% if scoreboard %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Issuer</th>
+                                <th>Total Funds</th>
+                                <th>Total AUM</th>
+                                <th>WoW Change</th>
+                                <th>% Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for issuer in scoreboard %}
+                            <tr>
+                                <td><strong>{{ issuer.name }}</strong></td>
+                                <td>{{ issuer.fund_count }}</td>
+                                <td>${{ "{:,.0f}".format(issuer.total_aum) }}</td>
+                                <td class="{% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
+                                    {% if issuer.aum_change > 0 %}+{% endif %}${{ "{:,.0f}".format(issuer.aum_change) }}
+                                </td>
+                                <td class="{% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
+                                    {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">No scoreboard data available</div>
+                {% endif %}
+            </div>
+            
+            <!-- Section 5: AUM Movers -->
+            <div class="section">
+                <h2 class="section-title">📈 Top AUM Movers</h2>
+                {% if top_gainers or top_losers %}
+                    <h3 style="color: #059669; margin-bottom: 12px;">Top 10 Gainers</h3>
+                    {% if top_gainers %}
+                        <table style="margin-bottom: 30px;">
+                            <thead>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Issuer</th>
+                                    <th>Previous AUM</th>
+                                    <th>Current AUM</th>
+                                    <th>Change</th>
+                                    <th>% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mover in top_gainers %}
+                                <tr>
+                                    <td><strong>{{ mover.ticker }}</strong></td>
+                                    <td>{{ mover.issuer }}</td>
+                                    <td>${{ "{:,.0f}".format(mover.prev_aum) }}</td>
+                                    <td>${{ "{:,.0f}".format(mover.current_aum) }}</td>
+                                    <td class="positive">+${{ "{:,.0f}".format(mover.change) }}</td>
+                                    <td class="positive">+{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                    
+                    <h3 style="color: #dc2626; margin-bottom: 12px;">Top 10 Losers</h3>
+                    {% if top_losers %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Issuer</th>
+                                    <th>Previous AUM</th>
+                                    <th>Current AUM</th>
+                                    <th>Change</th>
+                                    <th>% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mover in top_losers %}
+                                <tr>
+                                    <td><strong>{{ mover.ticker }}</strong></td>
+                                    <td>{{ mover.issuer }}</td>
+                                    <td>${{ "{:,.0f}".format(mover.prev_aum) }}</td>
+                                    <td>${{ "{:,.0f}".format(mover.current_aum) }}</td>
+                                    <td class="negative">${{ "{:,.0f}".format(mover.change) }}</td>
+                                    <td class="negative">{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">No AUM movement data available</div>
+                {% endif %}
+            </div>
+            
+            <!-- Section 6: Fund Count Changes -->
+            <div class="section">
+                <h2 class="section-title">📊 Fund Count Changes</h2>
+                {% if fund_count_changes %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Issuer</th>
+                                <th>Previous Count</th>
+                                <th>Current Count</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for change in fund_count_changes %}
+                            <tr>
+                                <td><strong>{{ change.issuer }}</strong></td>
+                                <td>{{ change.prev_count }}</td>
+                                <td>{{ change.current_count }}</td>
+                                <td class="{% if change.change > 0 %}positive{% elif change.change < 0 %}negative{% else %}neutral{% endif %}">
+                                    {% if change.change > 0 %}+{% endif %}{{ change.change }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">No fund count changes this week</div>
+                {% endif %}
+            </div>
+            
+            <!-- Section 7: Full Fund List -->
+            <div class="section">
+                <h2 class="section-title">📋 Full Fund List</h2>
+                {% if fund_list %}
+                    {% for issuer_group in fund_list %}
+                    <div class="issuer-group">
+                        <div class="issuer-header">
+                            {{ issuer_group.name }} ({{ issuer_group.fund_count }} funds)
+                        </div>
+                        <div class="fund-list">
+                            {% for fund in issuer_group.funds %}
+                            <div class="fund-item">
+                                <span class="fund-ticker">{{ fund.ticker }}</span>
+                                <span class="fund-name">{{ fund.name }}</span>
+                                <span class="fund-aum">
+                                    {% if fund.aum %}
+                                        ${{ "{:,.0f}".format(fund.aum) }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No fund data available</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Generated by ETF Ticker Scraper | {{ generation_time }}</p>
+        </div>
+    </div>
+</body>
+</html>
