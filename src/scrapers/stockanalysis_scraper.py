@@ -9,7 +9,7 @@ from typing import Optional
 from playwright.sync_api import sync_playwright, Page, Browser, Playwright
 from bs4 import BeautifulSoup
 
-from ..utils.config import ISSUERS, SCRAPE_DELAY_MIN, SCRAPE_DELAY_MAX, HEADLESS
+from ..utils.config import STOCKANALYSIS_ISSUERS, SCRAPE_DELAY_MIN, SCRAPE_DELAY_MAX, HEADLESS
 from ..utils.models import ETFund, IssuerSnapshot
 from ..utils.logger import get_logger
 
@@ -263,22 +263,16 @@ class StockAnalysisScraper:
         """
         results = {}
         
-        # Filter to only stockanalysis issuers (exclude CUSTOM_SCRAPER)
-        stockanalysis_issuers = {
-            slug: url for slug, url in ISSUERS.items()
-            if url != "CUSTOM_SCRAPER"
-        }
+        logger.info(f"Starting scrape of {len(STOCKANALYSIS_ISSUERS)} issuers")
         
-        logger.info(f"Starting scrape of {len(stockanalysis_issuers)} issuers")
-        
-        for i, (issuer_slug, url) in enumerate(stockanalysis_issuers.items(), 1):
+        for i, (issuer_slug, url) in enumerate(STOCKANALYSIS_ISSUERS.items(), 1):
             try:
                 # Scrape the issuer
                 snapshot = self.scrape_issuer(issuer_slug, url)
                 results[issuer_slug] = snapshot
                 
                 # Random delay between requests (except after last one)
-                if i < len(stockanalysis_issuers):
+                if i < len(STOCKANALYSIS_ISSUERS):
                     delay = random.uniform(SCRAPE_DELAY_MIN, SCRAPE_DELAY_MAX)
                     logger.debug(f"Waiting {delay:.1f}s before next issuer...")
                     time.sleep(delay)
