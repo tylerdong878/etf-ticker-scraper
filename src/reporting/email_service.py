@@ -294,11 +294,14 @@ def send_email(
         logger.info("Converting full report to PDF...")
         pdf_bytes = generate_pdf(full_report_html)
         
+        # Parse recipient emails (comma-separated)
+        recipient_list = [email.strip() for email in RECIPIENT_EMAIL.split(',')]
+        
         # Create multipart message
         msg = MIMEMultipart('mixed')
         msg['Subject'] = subject
         msg['From'] = GMAIL_USER
-        msg['To'] = RECIPIENT_EMAIL
+        msg['To'] = RECIPIENT_EMAIL  # Display all recipients in email header
         
         # Attach email body HTML
         html_part = MIMEText(email_body_html, 'html')
@@ -316,9 +319,9 @@ def send_email(
         logger.info(f"Connecting to Gmail SMTP server...")
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-            server.send_message(msg)
+            server.sendmail(GMAIL_USER, recipient_list, msg.as_string())
         
-        logger.info(f"Email sent successfully to {RECIPIENT_EMAIL}")
+        logger.info(f"Email sent successfully to {len(recipient_list)} recipient(s): {RECIPIENT_EMAIL}")
         return True
         
     except Exception as e:
