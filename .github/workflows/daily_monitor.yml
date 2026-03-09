@@ -1,0 +1,112 @@
+name: Daily ETF Monitor
+
+on:
+  # Run at 10:00 UTC (6 AM ET) on weekdays
+  schedule:
+    - cron: '0 10 * * 1-5'
+  
+  # Allow manual trigger with mode selection
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode'
+        required: true
+        default: 'scrape'
+        type: choice
+        options:
+          - scrape
+          - report
+          - both
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Install Playwright browsers
+        run: |
+          playwright install chromium --with-deps
+      
+      - name: Determine run mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            MODE="${{ inputs.mode }}"
+          else
+            # Check if today is Monday (1 = Monday in date command)
+            DAY=$(date +%u)
+            if [ "$DAY" = "1" ]; then
+              MODE="both"
+            else
+              MODE="scrape"
+            fi
+          fi
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+          echo "Running in $MODE mode"
+      
+      - name: Set up environment variables
+        run: |
+          echo "GMAIL_USER=${{ secrets.GMAIL_USER }}" >> $GITHUB_ENV
+          echo "GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}" >> $GITHUB_ENV
+          echo "RECIPIENT_EMAIL=${{ secrets.RECIPIENT_EMAIL }}" >> $GITHUB_ENV
+          echo "HEADLESS=true" >> $GITHUB_ENV
+          echo "ENRICH_WITH_YFINANCE=true" >> $GITHUB_ENV
+          echo "SEND_EMAIL=true" >> $GITHUB_ENV
+          echo "DRY_RUN=false" >> $GITHUB_ENV
+          echo "REPORT_FREQUENCY=weekly" >> $GITHUB_ENV
+      
+      - name: Run ETF scraper
+        run: |
+          python3 -m src.main --mode ${{ steps.mode.outputs.mode }}
+      
+      - name: Configure git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      
+      - name: Commit and push changes
+        run: |
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update ETF data - $(date +'%Y-%m-%d')"
+            git push
+          fi
+      
+      - name: Send error notification
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "⚠️ ETF Scraper Failed - ${{ github.run_id }}"
+          to: ${{ secrets.RECIPIENT_EMAIL }}
+          from: ${{ secrets.GMAIL_USER }}
+          body: |
+            The ETF ticker scraper workflow failed.
+            
+            Run ID: ${{ github.run_id }}
+            Mode: ${{ steps.mode.outputs.mode }}
+            Date: ${{ github.event.head_commit.timestamp }}
+            
+            View logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
