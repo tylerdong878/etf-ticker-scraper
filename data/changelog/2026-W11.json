@@ -750,5 +750,1174 @@
         }
       ]
     }
+  },
+  {
+    "date": "2026-03-11",
+    "changes": {
+      "launches": [],
+      "closures": [],
+      "aum_changes": [
+        {
+          "ticker": "ITWO",
+          "issuer": "proshares",
+          "prev_aum": 148070000,
+          "current_aum": 150870000,
+          "change": 2800000,
+          "change_pct": 0.018909975011818736
+        },
+        {
+          "ticker": "ONLN",
+          "issuer": "proshares",
+          "prev_aum": 63120000,
+          "current_aum": 63080000,
+          "change": -40000,
+          "change_pct": -0.0006337135614702154
+        },
+        {
+          "ticker": "ION",
+          "issuer": "proshares",
+          "prev_aum": 14270000,
+          "current_aum": 14110000,
+          "change": -160000,
+          "change_pct": -0.011212333566923615
+        },
+        {
+          "ticker": "SKYU",
+          "issuer": "proshares",
+          "prev_aum": 1490000,
+          "current_aum": 1500000,
+          "change": 10000,
+          "change_pct": 0.006711409395973154
+        },
+        {
+          "ticker": "ANEW",
+          "issuer": "proshares",
+          "prev_aum": 7180000,
+          "current_aum": 7200000,
+          "change": 20000,
+          "change_pct": 0.002785515320334262
+        },
+        {
+          "ticker": "BETH",
+          "issuer": "proshares",
+          "prev_aum": 12290000,
+          "current_aum": 12480000,
+          "change": 190000,
+          "change_pct": 0.015459723352318959
+        },
+        {
+          "ticker": "VERS",
+          "issuer": "proshares",
+          "prev_aum": 5040000,
+          "current_aum": 4890000,
+          "change": -150000,
+          "change_pct": -0.02976190476190476
+        },
+        {
+          "ticker": "UCYB",
+          "issuer": "proshares",
+          "prev_aum": 4810000,
+          "current_aum": 4850000,
+          "change": 40000,
+          "change_pct": 0.008316008316008316
+        },
+        {
+          "ticker": "BITU",
+          "issuer": "proshares",
+          "prev_aum": 375680000,
+          "current_aum": 391710000,
+          "change": 16030000,
+          "change_pct": 0.0426692930153322
+        },
+        {
+          "ticker": "QQQA",
+          "issuer": "proshares",
+          "prev_aum": 11000000,
+          "current_aum": 10960000,
+          "change": -40000,
+          "change_pct": -0.0036363636363636364
+        },
+        {
+          "ticker": "EETH",
+          "issuer": "proshares",
+          "prev_aum": 59720000,
+          "current_aum": 60160000,
+          "change": 440000,
+          "change_pct": 0.007367716008037508
+        },
+        {
+          "ticker": "MAKX",
+          "issuer": "proshares",
+          "prev_aum": 1350000,
+          "current_aum": 1340000,
+          "change": -10000,
+          "change_pct": -0.007407407407407408
+        },
+        {
+          "ticker": "ISPY",
+          "issuer": "proshares",
+          "prev_aum": 1190000000,
+          "current_aum": 1200000000,
+          "change": 10000000,
+          "change_pct": 0.008403361344537815
+        },
+        {
+          "ticker": "TDV",
+          "issuer": "proshares",
+          "prev_aum": 249290000,
+          "current_aum": 251050000,
+          "change": 1760000,
+          "change_pct": 0.007060050543543664
+        },
+        {
+          "ticker": "REGL",
+          "issuer": "proshares",
+          "prev_aum": 1710000000,
+          "current_aum": 1690000000,
+          "change": -20000000,
+          "change_pct": -0.011695906432748537
+        },
+        {
+          "ticker": "BETE",
+          "issuer": "proshares",
+          "prev_aum": 8520000,
+          "current_aum": 8690000,
+          "change": 170000,
+          "change_pct": 0.01995305164319249
+        },
+        {
+          "ticker": "SETH",
+          "issuer": "proshares",
+          "prev_aum": 16040000,
+          "current_aum": 15590000,
+          "change": -450000,
+          "change_pct": -0.02805486284289277
+        },
+        {
+          "ticker": "YMAX",
+          "issuer": "yieldmax",
+          "prev_aum": 426240000,
+          "current_aum": 434670000,
+          "change": 8430000,
+          "change_pct": 0.01977759009009009
+        },
+        {
+          "ticker": "FBY",
+          "issuer": "yieldmax",
+          "prev_aum": 100450000,
+          "current_aum": 100890000,
+          "change": 440000,
+          "change_pct": 0.004380288700846192
+        },
+        {
+          "ticker": "CONY",
+          "issuer": "yieldmax",
+          "prev_aum": 415040000,
+          "current_aum": 422050000,
+          "change": 7010000,
+          "change_pct": 0.01688993831919815
+        },
+        {
+          "ticker": "GOOY",
+          "issuer": "yieldmax",
+          "prev_aum": 210700000,
+          "current_aum": 215150000,
+          "change": 4450000,
+          "change_pct": 0.021120075937351684
+        },
+        {
+          "ticker": "MSTY",
+          "issuer": "yieldmax",
+          "prev_aum": 1060000000,
+          "current_aum": 1100000000,
+          "change": 40000000,
+          "change_pct": 0.03773584905660377
+        },
+        {
+          "ticker": "RDTY",
+          "issuer": "yieldmax",
+          "prev_aum": 29170000,
+          "current_aum": 29590000,
+          "change": 420000,
+          "change_pct": 0.014398354473774426
+        },
+        {
+          "ticker": "XOMO",
+          "issuer": "yieldmax",
+          "prev_aum": 64239999,
+          "current_aum": 63980000,
+          "change": -259999,
+          "change_pct": -0.0040473070368509815
+        },
+        {
+          "ticker": "NVDY",
+          "issuer": "yieldmax",
+          "prev_aum": 1320000000,
+          "current_aum": 1350000000,
+          "change": 30000000,
+          "change_pct": 0.022727272727272728
+        },
+        {
+          "ticker": "APLY",
+          "issuer": "yieldmax",
+          "prev_aum": 124080000,
+          "current_aum": 125060000,
+          "change": 980000,
+          "change_pct": 0.00789813023855577
+        },
+        {
+          "ticker": "DISO",
+          "issuer": "yieldmax",
+          "prev_aum": 5990000,
+          "current_aum": 5970000,
+          "change": -20000,
+          "change_pct": -0.00333889816360601
+        },
+        {
+          "ticker": "YBIT",
+          "issuer": "yieldmax",
+          "prev_aum": 41300000,
+          "current_aum": 41670000,
+          "change": 370000,
+          "change_pct": 0.008958837772397095
+        },
+        {
+          "ticker": "TSMY",
+          "issuer": "yieldmax",
+          "prev_aum": 97360000,
+          "current_aum": 101400000,
+          "change": 4040000,
+          "change_pct": 0.04149548069022186
+        },
+        {
+          "ticker": "FIVY",
+          "issuer": "yieldmax",
+          "prev_aum": 4770000,
+          "current_aum": 4940000,
+          "change": 170000,
+          "change_pct": 0.03563941299790356
+        },
+        {
+          "ticker": "GDXY",
+          "issuer": "yieldmax",
+          "prev_aum": 327820000,
+          "current_aum": 326400000,
+          "change": -1420000,
+          "change_pct": -0.0043316454151668595
+        },
+        {
+          "ticker": "BABO",
+          "issuer": "yieldmax",
+          "prev_aum": 19890000,
+          "current_aum": 20090000,
+          "change": 200000,
+          "change_pct": 0.010055304172951232
+        },
+        {
+          "ticker": "AMZY",
+          "issuer": "yieldmax",
+          "prev_aum": 209330000,
+          "current_aum": 209690000,
+          "change": 360000,
+          "change_pct": 0.001719772607844074
+        },
+        {
+          "ticker": "YQQQ",
+          "issuer": "yieldmax",
+          "prev_aum": 16770000,
+          "current_aum": 16629999,
+          "change": -140001,
+          "change_pct": -0.00834830053667263
+        },
+        {
+          "ticker": "MRNY",
+          "issuer": "yieldmax",
+          "prev_aum": 127600000,
+          "current_aum": 131120000,
+          "change": 3520000,
+          "change_pct": 0.027586206896551724
+        },
+        {
+          "ticker": "AMDY",
+          "issuer": "yieldmax",
+          "prev_aum": 127270000,
+          "current_aum": 132389999,
+          "change": 5119999,
+          "change_pct": 0.04022942563054922
+        },
+        {
+          "ticker": "NFLY",
+          "issuer": "yieldmax",
+          "prev_aum": 58120000,
+          "current_aum": 58050000,
+          "change": -70000,
+          "change_pct": -0.0012044046799724708
+        },
+        {
+          "ticker": "ULTY",
+          "issuer": "yieldmax",
+          "prev_aum": 925210000,
+          "current_aum": 946300000,
+          "change": 21090000,
+          "change_pct": 0.022794824958658033
+        },
+        {
+          "ticker": "MARO",
+          "issuer": "yieldmax",
+          "prev_aum": 27080000,
+          "current_aum": 28870000,
+          "change": 1790000,
+          "change_pct": 0.06610044313146234
+        },
+        {
+          "ticker": "AIYY",
+          "issuer": "yieldmax",
+          "prev_aum": 25810000,
+          "current_aum": 25440000,
+          "change": -370000,
+          "change_pct": -0.014335528864781092
+        },
+        {
+          "ticker": "ABNY",
+          "issuer": "yieldmax",
+          "prev_aum": 26420000,
+          "current_aum": 26640000,
+          "change": 220000,
+          "change_pct": 0.008327024981074944
+        },
+        {
+          "ticker": "FEAT",
+          "issuer": "yieldmax",
+          "prev_aum": 10800000,
+          "current_aum": 11150000,
+          "change": 350000,
+          "change_pct": 0.032407407407407406
+        },
+        {
+          "ticker": "YMAG",
+          "issuer": "yieldmax",
+          "prev_aum": 311780000,
+          "current_aum": 311590000,
+          "change": -190000,
+          "change_pct": -0.0006094040669702996
+        },
+        {
+          "ticker": "QDTY",
+          "issuer": "yieldmax",
+          "prev_aum": 19850000,
+          "current_aum": 20160000,
+          "change": 310000,
+          "change_pct": 0.015617128463476071
+        },
+        {
+          "ticker": "PYPY",
+          "issuer": "yieldmax",
+          "prev_aum": 11960000,
+          "current_aum": 10990000,
+          "change": -970000,
+          "change_pct": -0.08110367892976589
+        },
+        {
+          "ticker": "MSFO",
+          "issuer": "yieldmax",
+          "prev_aum": 85620000,
+          "current_aum": 85830000,
+          "change": 210000,
+          "change_pct": 0.002452697967764541
+        },
+        {
+          "ticker": "CRSH",
+          "issuer": "yieldmax",
+          "prev_aum": 18710000,
+          "current_aum": 18630000,
+          "change": -80000,
+          "change_pct": -0.00427578834847675
+        },
+        {
+          "ticker": "SOLZ",
+          "issuer": "volatility-shares",
+          "prev_aum": 105619905,
+          "current_aum": 105622003,
+          "change": 2098,
+          "change_pct": 1.9863680051596334e-05
+        },
+        {
+          "ticker": "XRPI",
+          "issuer": "volatility-shares",
+          "prev_aum": 103870288,
+          "current_aum": 108796233,
+          "change": 4925945,
+          "change_pct": 0.04742400444677693
+        },
+        {
+          "ticker": "UVIX",
+          "issuer": "volatility-shares",
+          "prev_aum": 356603577,
+          "current_aum": 377626815,
+          "change": 21023238,
+          "change_pct": 0.058954086150403366
+        },
+        {
+          "ticker": "ZVOL",
+          "issuer": "volatility-shares",
+          "prev_aum": 12006484,
+          "current_aum": 11768350,
+          "change": -238134,
+          "change_pct": -0.019833783145840198
+        },
+        {
+          "ticker": "XRPT",
+          "issuer": "volatility-shares",
+          "prev_aum": 70843047,
+          "current_aum": 72177689,
+          "change": 1334642,
+          "change_pct": 0.01883942117848206
+        },
+        {
+          "ticker": "ETHU",
+          "issuer": "volatility-shares",
+          "prev_aum": 820029167,
+          "current_aum": 852614529,
+          "change": 32585362,
+          "change_pct": 0.03973683292170021
+        },
+        {
+          "ticker": "SOLT",
+          "issuer": "volatility-shares",
+          "prev_aum": 154111816,
+          "current_aum": 151068719,
+          "change": -3043097,
+          "change_pct": -0.01974603297128106
+        },
+        {
+          "ticker": "OOSB",
+          "issuer": "volatility-shares",
+          "prev_aum": 496479,
+          "current_aum": 502604,
+          "change": 6125,
+          "change_pct": 0.012336876282783361
+        },
+        {
+          "ticker": "SVIX",
+          "issuer": "volatility-shares",
+          "prev_aum": 233854810,
+          "current_aum": 267492563,
+          "change": 33637753,
+          "change_pct": 0.14384032981831762
+        },
+        {
+          "ticker": "BITX",
+          "issuer": "volatility-shares",
+          "prev_aum": 951738663,
+          "current_aum": 962956099,
+          "change": 11217436,
+          "change_pct": 0.0117862564967585
+        },
+        {
+          "ticker": "OOQB",
+          "issuer": "volatility-shares",
+          "prev_aum": 657412,
+          "current_aum": 666612,
+          "change": 9200,
+          "change_pct": 0.01399426843440643
+        },
+        {
+          "ticker": "GOOP",
+          "issuer": "kurv",
+          "prev_aum": 20542645,
+          "current_aum": 21120379,
+          "change": 577734,
+          "change_pct": 0.028123642306041894
+        },
+        {
+          "ticker": "NFLP",
+          "issuer": "kurv",
+          "prev_aum": 8341966,
+          "current_aum": 8277557,
+          "change": -64409,
+          "change_pct": -0.007721081577172576
+        },
+        {
+          "ticker": "MSFY",
+          "issuer": "kurv",
+          "prev_aum": 8288250,
+          "current_aum": 8290057,
+          "change": 1807,
+          "change_pct": 0.0002180194854161011
+        },
+        {
+          "ticker": "AMZP",
+          "issuer": "kurv",
+          "prev_aum": 20199755,
+          "current_aum": 20221864,
+          "change": 22109,
+          "change_pct": 0.00109451822559234
+        },
+        {
+          "ticker": "KSLV",
+          "issuer": "kurv",
+          "prev_aum": 96460850,
+          "current_aum": 99297807,
+          "change": 2836957,
+          "change_pct": 0.02941044993901671
+        },
+        {
+          "ticker": "KGLD",
+          "issuer": "kurv",
+          "prev_aum": 94273451,
+          "current_aum": 94001685,
+          "change": -271766,
+          "change_pct": -0.0028827416108910663
+        },
+        {
+          "ticker": "KQQQ",
+          "issuer": "kurv",
+          "prev_aum": 93887450,
+          "current_aum": 95328805,
+          "change": 1441355,
+          "change_pct": 0.015351945334546844
+        },
+        {
+          "ticker": "KCOP",
+          "issuer": "kurv",
+          "prev_aum": 5226638,
+          "current_aum": 5749410,
+          "change": 522772,
+          "change_pct": 0.10002070164415443
+        },
+        {
+          "ticker": "KYLD",
+          "issuer": "kurv",
+          "prev_aum": 36391732,
+          "current_aum": 37369761,
+          "change": 978029,
+          "change_pct": 0.026875033043219816
+        },
+        {
+          "ticker": "TSLP",
+          "issuer": "kurv",
+          "prev_aum": 20388772,
+          "current_aum": 20488142,
+          "change": 99370,
+          "change_pct": 0.004873760911152472
+        },
+        {
+          "ticker": "AAPY",
+          "issuer": "kurv",
+          "prev_aum": 5220333,
+          "current_aum": 5273714,
+          "change": 53381,
+          "change_pct": 0.010225592888423018
+        },
+        {
+          "ticker": "SPYQ",
+          "issuer": "tradr",
+          "prev_aum": 11970000,
+          "current_aum": 12180000,
+          "change": 210000,
+          "change_pct": 0.017543859649122806
+        },
+        {
+          "ticker": "MQQQ",
+          "issuer": "tradr",
+          "prev_aum": 110320000,
+          "current_aum": 113280000,
+          "change": 2960000,
+          "change_pct": 0.026831036983321246
+        },
+        {
+          "ticker": "BNKD",
+          "issuer": "rex",
+          "prev_aum": 1770000,
+          "current_aum": 1860000,
+          "change": 90000,
+          "change_pct": 0.05084745762711865
+        },
+        {
+          "ticker": "SPYT",
+          "issuer": "defiance",
+          "prev_aum": 145330000,
+          "current_aum": 146490000,
+          "change": 1160000,
+          "change_pct": 0.00798183444574417
+        },
+        {
+          "ticker": "SOFX",
+          "issuer": "defiance",
+          "prev_aum": 51760000,
+          "current_aum": 51530000,
+          "change": -230000,
+          "change_pct": -0.004443585780525503
+        },
+        {
+          "ticker": "QQQT",
+          "issuer": "defiance",
+          "prev_aum": 36470000,
+          "current_aum": 36930000,
+          "change": 460000,
+          "change_pct": 0.012613106663010694
+        },
+        {
+          "ticker": "WDTE",
+          "issuer": "defiance",
+          "prev_aum": 64720000,
+          "current_aum": 65150000,
+          "change": 430000,
+          "change_pct": 0.006644004944375772
+        },
+        {
+          "ticker": "SMCX",
+          "issuer": "defiance",
+          "prev_aum": 159200000,
+          "current_aum": 162460000,
+          "change": 3260000,
+          "change_pct": 0.020477386934673367
+        },
+        {
+          "ticker": "QTUM",
+          "issuer": "defiance",
+          "prev_aum": 3480000000,
+          "current_aum": 3510000000,
+          "change": 30000000,
+          "change_pct": 0.008620689655172414
+        },
+        {
+          "ticker": "IWMY",
+          "issuer": "defiance",
+          "prev_aum": 98090000,
+          "current_aum": 99110000,
+          "change": 1020000,
+          "change_pct": 0.010398613518197574
+        },
+        {
+          "ticker": "QQQY",
+          "issuer": "defiance",
+          "prev_aum": 172070000,
+          "current_aum": 171990000,
+          "change": -80000,
+          "change_pct": -0.0004649270645667461
+        },
+        {
+          "ticker": "BTCI",
+          "issuer": "neos",
+          "prev_aum": 916260000,
+          "current_aum": 926740000,
+          "change": 10480000,
+          "change_pct": 0.01143780149739157
+        },
+        {
+          "ticker": "HYBI",
+          "issuer": "neos",
+          "prev_aum": 207070000,
+          "current_aum": 207890000,
+          "change": 820000,
+          "change_pct": 0.0039600135219973924
+        },
+        {
+          "ticker": "QQQI",
+          "issuer": "neos",
+          "prev_aum": 8960000000,
+          "current_aum": 9080000000,
+          "change": 120000000,
+          "change_pct": 0.013392857142857142
+        },
+        {
+          "ticker": "IWMI",
+          "issuer": "neos",
+          "prev_aum": 651500000,
+          "current_aum": 658290000,
+          "change": 6790000,
+          "change_pct": 0.01042210283960092
+        },
+        {
+          "ticker": "NVDL",
+          "issuer": "graniteshares",
+          "prev_aum": 3990000000,
+          "current_aum": 4280000000,
+          "change": 290000000,
+          "change_pct": 0.07268170426065163
+        },
+        {
+          "ticker": "TQQY",
+          "issuer": "graniteshares",
+          "prev_aum": 9050000,
+          "current_aum": 9120000,
+          "change": 70000,
+          "change_pct": 0.0077348066298342545
+        },
+        {
+          "ticker": "TSDD",
+          "issuer": "graniteshares",
+          "prev_aum": 55320000,
+          "current_aum": 48100000,
+          "change": -7220000,
+          "change_pct": -0.13051337671728128
+        },
+        {
+          "ticker": "TSMU",
+          "issuer": "graniteshares",
+          "prev_aum": 32570000,
+          "current_aum": 34440000,
+          "change": 1870000,
+          "change_pct": 0.05741479889468836
+        },
+        {
+          "ticker": "UBRL",
+          "issuer": "graniteshares",
+          "prev_aum": 18960000,
+          "current_aum": 18310000,
+          "change": -650000,
+          "change_pct": -0.034282700421940926
+        },
+        {
+          "ticker": "BABX",
+          "issuer": "graniteshares",
+          "prev_aum": 101590000,
+          "current_aum": 104450000,
+          "change": 2860000,
+          "change_pct": 0.02815237720248056
+        },
+        {
+          "ticker": "NVD",
+          "issuer": "graniteshares",
+          "prev_aum": 82390000,
+          "current_aum": 68100000,
+          "change": -14290000,
+          "change_pct": -0.1734433790508557
+        },
+        {
+          "ticker": "BAR",
+          "issuer": "graniteshares",
+          "prev_aum": 1800000000,
+          "current_aum": 1780000000,
+          "change": -20000000,
+          "change_pct": -0.011111111111111112
+        },
+        {
+          "ticker": "DRUP",
+          "issuer": "graniteshares",
+          "prev_aum": 47620000,
+          "current_aum": 47760000,
+          "change": 140000,
+          "change_pct": 0.0029399412011759767
+        },
+        {
+          "ticker": "FBL",
+          "issuer": "graniteshares",
+          "prev_aum": 238110000,
+          "current_aum": 239940000,
+          "change": 1830000,
+          "change_pct": 0.007685523497543152
+        },
+        {
+          "ticker": "TSLR",
+          "issuer": "graniteshares",
+          "prev_aum": 154120000,
+          "current_aum": 155610000,
+          "change": 1490000,
+          "change_pct": 0.009667791331430054
+        },
+        {
+          "ticker": "PTIR",
+          "issuer": "graniteshares",
+          "prev_aum": 545670000,
+          "current_aum": 532220000,
+          "change": -13450000,
+          "change_pct": -0.024648597137464034
+        },
+        {
+          "ticker": "MSFL",
+          "issuer": "graniteshares",
+          "prev_aum": 100200000,
+          "current_aum": 99100000,
+          "change": -1100000,
+          "change_pct": -0.010978043912175649
+        },
+        {
+          "ticker": "CONI",
+          "issuer": "graniteshares",
+          "prev_aum": 14490000,
+          "current_aum": 13590000,
+          "change": -900000,
+          "change_pct": -0.062111801242236024
+        },
+        {
+          "ticker": "AMZZ",
+          "issuer": "graniteshares",
+          "prev_aum": 45730000,
+          "current_aum": 47670000,
+          "change": 1940000,
+          "change_pct": 0.04242291712223923
+        },
+        {
+          "ticker": "SMCL",
+          "issuer": "graniteshares",
+          "prev_aum": 43350000,
+          "current_aum": 48380000,
+          "change": 5030000,
+          "change_pct": 0.1160322952710496
+        },
+        {
+          "ticker": "AMDL",
+          "issuer": "graniteshares",
+          "prev_aum": 505320000,
+          "current_aum": 552730000,
+          "change": 47410000,
+          "change_pct": 0.09382173672128552
+        },
+        {
+          "ticker": "PLTM",
+          "issuer": "graniteshares",
+          "prev_aum": 287630000,
+          "current_aum": 303170000,
+          "change": 15540000,
+          "change_pct": 0.05402774397663665
+        },
+        {
+          "ticker": "WEBL",
+          "issuer": "direxion",
+          "prev_aum": 94190000,
+          "current_aum": 93870000,
+          "change": -320000,
+          "change_pct": -0.003397388257776834
+        },
+        {
+          "ticker": "NFXL",
+          "issuer": "direxion",
+          "prev_aum": 171400000,
+          "current_aum": 164930000,
+          "change": -6470000,
+          "change_pct": -0.037747957992998835
+        },
+        {
+          "ticker": "HIBS",
+          "issuer": "direxion",
+          "prev_aum": 27420000,
+          "current_aum": 28180000,
+          "change": 760000,
+          "change_pct": 0.027716994894237783
+        },
+        {
+          "ticker": "CSCL",
+          "issuer": "direxion",
+          "prev_aum": 5250000,
+          "current_aum": 4930000,
+          "change": -320000,
+          "change_pct": -0.06095238095238095
+        },
+        {
+          "ticker": "UTSL",
+          "issuer": "direxion",
+          "prev_aum": 51550000,
+          "current_aum": 48370000,
+          "change": -3180000,
+          "change_pct": -0.06168768186226964
+        },
+        {
+          "ticker": "HCMT",
+          "issuer": "direxion",
+          "prev_aum": 542360000,
+          "current_aum": 554300000,
+          "change": 11940000,
+          "change_pct": 0.022014897853824027
+        },
+        {
+          "ticker": "WEBS",
+          "issuer": "direxion",
+          "prev_aum": 13980000,
+          "current_aum": 13880000,
+          "change": -100000,
+          "change_pct": -0.00715307582260372
+        },
+        {
+          "ticker": "QQQU",
+          "issuer": "direxion",
+          "prev_aum": 85580000,
+          "current_aum": 87450000,
+          "change": 1870000,
+          "change_pct": 0.021850899742930592
+        },
+        {
+          "ticker": "REKT",
+          "issuer": "direxion",
+          "prev_aum": 1900000,
+          "current_aum": 1850000,
+          "change": -50000,
+          "change_pct": -0.02631578947368421
+        },
+        {
+          "ticker": "HIBL",
+          "issuer": "direxion",
+          "prev_aum": 49290000,
+          "current_aum": 51890000,
+          "change": 2600000,
+          "change_pct": 0.052749036315682694
+        },
+        {
+          "ticker": "NVDU",
+          "issuer": "direxion",
+          "prev_aum": 556820000,
+          "current_aum": 584200000,
+          "change": 27380000,
+          "change_pct": 0.04917208433605115
+        },
+        {
+          "ticker": "PLTD",
+          "issuer": "direxion",
+          "prev_aum": 40740000,
+          "current_aum": 41650000,
+          "change": 910000,
+          "change_pct": 0.022336769759450172
+        },
+        {
+          "ticker": "MUD",
+          "issuer": "direxion",
+          "prev_aum": 44100000,
+          "current_aum": 42230000,
+          "change": -1870000,
+          "change_pct": -0.04240362811791383
+        },
+        {
+          "ticker": "LMBO",
+          "issuer": "direxion",
+          "prev_aum": 6140000,
+          "current_aum": 6460000,
+          "change": 320000,
+          "change_pct": 0.05211726384364821
+        },
+        {
+          "ticker": "MSFD",
+          "issuer": "direxion",
+          "prev_aum": 8350000,
+          "current_aum": 9400000,
+          "change": 1050000,
+          "change_pct": 0.12574850299401197
+        },
+        {
+          "ticker": "NFXS",
+          "issuer": "direxion",
+          "prev_aum": 7200000,
+          "current_aum": 7250000,
+          "change": 50000,
+          "change_pct": 0.006944444444444444
+        },
+        {
+          "ticker": "AIBD",
+          "issuer": "direxion",
+          "prev_aum": 7150000,
+          "current_aum": 6960000,
+          "change": -190000,
+          "change_pct": -0.026573426573426574
+        },
+        {
+          "ticker": "UBOT",
+          "issuer": "direxion",
+          "prev_aum": 29160000,
+          "current_aum": 29450000,
+          "change": 290000,
+          "change_pct": 0.009945130315500686
+        },
+        {
+          "ticker": "AIBU",
+          "issuer": "direxion",
+          "prev_aum": 23090000,
+          "current_aum": 22670000,
+          "change": -420000,
+          "change_pct": -0.018189692507579038
+        },
+        {
+          "ticker": "DUSL",
+          "issuer": "direxion",
+          "prev_aum": 51500000,
+          "current_aum": 51470000,
+          "change": -30000,
+          "change_pct": -0.0005825242718446602
+        },
+        {
+          "ticker": "WANT",
+          "issuer": "direxion",
+          "prev_aum": 19240000,
+          "current_aum": 19300000,
+          "change": 60000,
+          "change_pct": 0.0031185031185031187
+        },
+        {
+          "ticker": "NVDD",
+          "issuer": "direxion",
+          "prev_aum": 23810000,
+          "current_aum": 23170000,
+          "change": -640000,
+          "change_pct": -0.026879462410751787
+        },
+        {
+          "ticker": "METD",
+          "issuer": "direxion",
+          "prev_aum": 7610000,
+          "current_aum": 7580000,
+          "change": -30000,
+          "change_pct": -0.003942181340341655
+        },
+        {
+          "ticker": "NXTI",
+          "issuer": "simplify",
+          "prev_aum": 35490000,
+          "current_aum": 35530000,
+          "change": 40000,
+          "change_pct": 0.0011270780501549732
+        },
+        {
+          "ticker": "YGLD",
+          "issuer": "simplify",
+          "prev_aum": 64390000,
+          "current_aum": 63210000,
+          "change": -1180000,
+          "change_pct": -0.018325826991768907
+        },
+        {
+          "ticker": "IOPP",
+          "issuer": "simplify",
+          "prev_aum": 8250000,
+          "current_aum": 8070000,
+          "change": -180000,
+          "change_pct": -0.02181818181818182
+        },
+        {
+          "ticker": "GAEM",
+          "issuer": "simplify",
+          "prev_aum": 39080000,
+          "current_aum": 38940000,
+          "change": -140000,
+          "change_pct": -0.0035823950870010235
+        },
+        {
+          "ticker": "QIS",
+          "issuer": "simplify",
+          "prev_aum": 55210000,
+          "current_aum": 55280000,
+          "change": 70000,
+          "change_pct": 0.001267886252490491
+        },
+        {
+          "ticker": "BUCK",
+          "issuer": "simplify",
+          "prev_aum": 396750000,
+          "current_aum": 396940000,
+          "change": 190000,
+          "change_pct": 0.0004788909892879647
+        },
+        {
+          "ticker": "HARD",
+          "issuer": "simplify",
+          "prev_aum": 82520000,
+          "current_aum": 85380000,
+          "change": 2860000,
+          "change_pct": 0.034658264663111976
+        },
+        {
+          "ticker": "BWTG",
+          "issuer": "tuttle-capital-management",
+          "prev_aum": 19330000,
+          "current_aum": 19480000,
+          "change": 150000,
+          "change_pct": 0.007759958613554061
+        },
+        {
+          "ticker": "TGLR",
+          "issuer": "tuttle-capital-management",
+          "prev_aum": 29560000,
+          "current_aum": 29770000,
+          "change": 210000,
+          "change_pct": 0.007104194857916103
+        },
+        {
+          "ticker": "QDTE",
+          "issuer": "roundhill",
+          "prev_aum": 849330000,
+          "current_aum": 866040000,
+          "change": 16710000,
+          "change_pct": 0.01967433153191339
+        },
+        {
+          "ticker": "XDTE",
+          "issuer": "roundhill",
+          "prev_aum": 342670000,
+          "current_aum": 345770000,
+          "change": 3100000,
+          "change_pct": 0.00904660460501357
+        },
+        {
+          "ticker": "NERD",
+          "issuer": "roundhill",
+          "prev_aum": 15950000,
+          "current_aum": 15910000,
+          "change": -40000,
+          "change_pct": -0.0025078369905956114
+        },
+        {
+          "ticker": "YETH",
+          "issuer": "roundhill",
+          "prev_aum": 65349999,
+          "current_aum": 66650000,
+          "change": 1300001,
+          "change_pct": 0.019892900074872228
+        },
+        {
+          "ticker": "BETZ",
+          "issuer": "roundhill",
+          "prev_aum": 52350000,
+          "current_aum": 52000000,
+          "change": -350000,
+          "change_pct": -0.0066857688634192934
+        },
+        {
+          "ticker": "MAGX",
+          "issuer": "roundhill",
+          "prev_aum": 56440000,
+          "current_aum": 57780000,
+          "change": 1340000,
+          "change_pct": 0.02374202693125443
+        },
+        {
+          "ticker": "MAGS",
+          "issuer": "roundhill",
+          "prev_aum": 3550000000,
+          "current_aum": 3600000000,
+          "change": 50000000,
+          "change_pct": 0.014084507042253521
+        },
+        {
+          "ticker": "RDTE",
+          "issuer": "roundhill",
+          "prev_aum": 156050000,
+          "current_aum": 158130000,
+          "change": 2080000,
+          "change_pct": 0.013329061198333868
+        },
+        {
+          "ticker": "OZEM",
+          "issuer": "roundhill",
+          "prev_aum": 53370000,
+          "current_aum": 53560000,
+          "change": 190000,
+          "change_pct": 0.0035600524639310474
+        },
+        {
+          "ticker": "CHAT",
+          "issuer": "roundhill",
+          "prev_aum": 1020000000,
+          "current_aum": 1040000000,
+          "change": 20000000,
+          "change_pct": 0.0196078431372549
+        },
+        {
+          "ticker": "YBTC",
+          "issuer": "roundhill",
+          "prev_aum": 157640000,
+          "current_aum": 160060000,
+          "change": 2420000,
+          "change_pct": 0.01535143364628267
+        }
+      ]
+    }
   }
 ]
