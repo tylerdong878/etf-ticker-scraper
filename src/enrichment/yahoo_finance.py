@@ -118,18 +118,23 @@ def _fetch_ticker_data(ticker: str) -> dict:
         inception_raw = info.get('fundInceptionDate')
         inception_date = _parse_inception_date(inception_raw)
         
+        # Extract total assets (AUM)
+        total_assets = info.get('totalAssets')
+
         return {
             "nav": nav,
             "volume": volume,
-            "inception_date": inception_date
+            "inception_date": inception_date,
+            "total_assets": total_assets
         }
-        
+
     except Exception as e:
         logger.debug(f"Failed to fetch data for {ticker}: {e}")
         return {
             "nav": None,
             "volume": None,
-            "inception_date": None
+            "inception_date": None,
+            "total_assets": None
         }
 
 
@@ -165,6 +170,11 @@ def enrich_funds(funds: list[ETFund]) -> list[ETFund]:
             fund.nav = cached_data.get("nav")
             fund.volume = cached_data.get("volume")
             fund.inception_date = cached_data.get("inception_date")
+            if not fund.aum:
+                total_assets = cached_data.get("total_assets")
+                if total_assets:
+                    fund.aum = total_assets
+                    logger.debug(f"Filled AUM for {ticker} from cache: {total_assets}")
             cached_count += 1
             logger.debug(f"[{i}/{len(funds)}] Using cached data for {ticker}")
             continue
@@ -177,6 +187,11 @@ def enrich_funds(funds: list[ETFund]) -> list[ETFund]:
         fund.nav = data["nav"]
         fund.volume = data["volume"]
         fund.inception_date = data["inception_date"]
+        if not fund.aum:
+            total_assets = data.get("total_assets")
+            if total_assets:
+                fund.aum = total_assets
+                logger.debug(f"Filled AUM for {ticker} from yfinance: {total_assets}")
         
         # Cache the result
         cache[ticker] = data
