@@ -59,6 +59,31 @@ def merge_rex_issuers(results: dict[str, IssuerSnapshot]) -> dict[str, IssuerSna
     return results
 
 
+def deduplicate_rex_tuttle(results: dict[str, IssuerSnapshot]) -> dict[str, IssuerSnapshot]:
+    """
+    Remove duplicate tickers that appear under both 'rex' and 'tuttle-capital-management'.
+    T-REX ETFs (MSTU, NVDX, TSLT, etc.) are listed by both issuers.
+    Keep them under 'rex' (the brand) and remove from 'tuttle-capital-management'.
+    """
+    rex = results.get("rex")
+    tuttle = results.get("tuttle-capital-management")
+
+    if not rex or not tuttle:
+        return results
+
+    rex_tickers = {f.ticker for f in rex.funds}
+    original_count = len(tuttle.funds)
+    tuttle.funds = [f for f in tuttle.funds if f.ticker not in rex_tickers]
+    removed = original_count - len(tuttle.funds)
+
+    if removed:
+        tuttle.total_funds = len(tuttle.funds)
+        tuttle.total_aum = sum(f.aum for f in tuttle.funds if f.aum)
+        logger.info(f"Deduplicated {removed} tickers from tuttle-capital-management (already in rex)")
+
+    return results
+
+
 def scrape_mode(specific_issuer: Optional[str] = None) -> None:
     """
     Run the scraping workflow.
@@ -118,7 +143,10 @@ def scrape_mode(specific_issuer: Optional[str] = None) -> None:
         
         # Step 4: Merge REX issuers
         results = merge_rex_issuers(results)
-        
+
+        # Step 4.5: Deduplicate tickers between rex and tuttle-capital-management
+        results = deduplicate_rex_tuttle(results)
+
         # Step 5: Enrich with yfinance if enabled
         if ENRICH_WITH_YFINANCE and not specific_issuer:
             logger.info("Enriching funds with yfinance data...")
