@@ -499,6 +499,93 @@ class LeverageSharesScraper:
             return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
 
 
+class BmoMaxScraper:
+    """Scraper for BMO MAX ETNs from https://www.maxetns.com/"""
+
+    def __init__(self):
+        self.url = DIRECT_ISSUERS["bmo-max"]
+        self.issuer_slug = "bmo-max"
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def scrape(self) -> IssuerSnapshot:
+        """
+        Scrape BMO MAX ETNs using plain requests (no browser needed).
+
+        Table structure: thead has Ticker | Product Name | Sector | Leverage Factor | Asset Class | Index
+        tbody rows have: th with ticker link, then td cells for each column
+
+        Returns:
+            IssuerSnapshot with all MAX ETN funds
+        """
+        import requests
+
+        logger.info(f"Scraping {self.issuer_slug}: {self.url}")
+
+        try:
+            resp = requests.get(self.url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp.raise_for_status()
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            table = soup.find("table")
+            if not table:
+                logger.error(f"No table found for {self.issuer_slug}")
+                return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
+
+            funds = []
+            tbody = table.find("tbody")
+            if tbody:
+                rows = tbody.find_all("tr")
+
+                for row in rows:
+                    try:
+                        th = row.find("th")
+                        if not th:
+                            continue
+
+                        # Ticker is inside an <a> tag within the <th>
+                        ticker_link = th.find("a")
+                        ticker = ticker_link.get_text(strip=True) if ticker_link else th.get_text(strip=True)
+                        if not ticker:
+                            continue
+
+                        cells = row.find_all("td")
+                        if len(cells) < 3:
+                            continue
+
+                        name = cells[0].get_text(strip=True)
+                        leverage_factor = cells[2].get_text(strip=True)
+
+                        fund = ETFund(
+                            ticker=ticker,
+                            name=name,
+                            issuer=self.issuer_slug,
+                            aum=None,
+                        )
+                        funds.append(fund)
+
+                    except Exception as e:
+                        logger.warning(f"Error parsing {self.issuer_slug} row: {e}")
+                        continue
+
+            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds (no AUM data)")
+
+            return IssuerSnapshot(
+                issuer_slug=self.issuer_slug,
+                total_funds=len(funds),
+                total_aum=0,
+                funds=funds,
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to scrape {self.issuer_slug}: {e}")
+            return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
+
+
 def scrape_all_direct() -> dict[str, IssuerSnapshot]:
     """
     Scrape all direct issuer websites using their individual scrapers.
@@ -511,7 +598,8 @@ def scrape_all_direct() -> dict[str, IssuerSnapshot]:
         KurvScraper(),
         VolatilitySharesScraper(),
         RexSharesScraper(),
-        LeverageSharesScraper()
+        LeverageSharesScraper(),
+        BmoMaxScraper()
     ]
     
     logger.info(f"Starting scrape of {len(scrapers)} direct issuers")

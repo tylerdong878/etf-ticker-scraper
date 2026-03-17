@@ -35,13 +35,11 @@ DIRECT_ISSUERS = {
     "volatility-shares": "https://www.volatilityshares.com/etf-product-list.php",
     "rex-shares": "https://www.rexshares.com/home/all-funds/",
     "leverage-shares": "https://leverageshares.com/us/all-etfs/",
+    "bmo-max": "https://www.maxetns.com/",
 }
 
 # New launches page on stockanalysis.com
 NEW_LAUNCHES_URL = "https://stockanalysis.com/etf/list/new/"
-
-# Deferred issuers (blocked or require special handling)
-BMO_DEFERRED = "https://www.bmogam.com/ca-en/products/exchange-traded-funds/"
 
 # Combined issuers dictionary for backward compatibility
 ISSUERS = {**STOCKANALYSIS_ISSUERS, **DIRECT_ISSUERS}
