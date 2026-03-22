@@ -319,101 +319,7 @@
         </div>
         
         <div class="content">
-            <!-- Section 1: Weekly Activity Log -->
-            <div class="section">
-                <h2 class="section-title">📅 Weekly Activity Log</h2>
-                {% if weekly_timeline %}
-                    <div class="timeline">
-                        {% for day in weekly_timeline %}
-                        <div class="timeline-item">
-                            <div class="timeline-date">{{ day.date }}</div>
-                            <div class="timeline-content">
-                                {{ day.launches }} launches, {{ day.closures }} closures, {{ day.aum_changes }} AUM changes
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="empty-state">No activity recorded this week</div>
-                {% endif %}
-            </div>
-            
-            <!-- Section 2: New Launches -->
-            <div class="section">
-                <h2 class="section-title">🚀 New Launches</h2>
-                {% if launches %}
-                    {% for launch in launches %}
-                    <div class="card">
-                        <div class="card-title">{{ launch.ticker }}</div>
-                        <div class="card-meta"><strong>Name:</strong> {{ launch.name }}</div>
-                        <div class="card-meta"><strong>Issuer:</strong> {{ launch.issuer }}</div>
-                        <div class="card-meta"><strong>Launch Date:</strong> {{ launch.date }}</div>
-                        {% if launch.aum %}
-                        <div class="card-meta"><strong>Initial AUM:</strong> ${{ "{:,.0f}".format(launch.aum) }}</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">No new launches this week</div>
-                {% endif %}
-            </div>
-            
-            <!-- Section 3: Closures & Delistings -->
-            <div class="section">
-                <h2 class="section-title">🔻 Closures & Delistings</h2>
-                {% if closures %}
-                    {% for closure in closures %}
-                    <div class="card">
-                        <div class="card-title">{{ closure.ticker }}</div>
-                        <div class="card-meta"><strong>Name:</strong> {{ closure.name }}</div>
-                        <div class="card-meta"><strong>Issuer:</strong> {{ closure.issuer }}</div>
-                        <div class="card-meta"><strong>Closure Date:</strong> {{ closure.date }}</div>
-                        {% if closure.last_aum %}
-                        <div class="card-meta"><strong>Last AUM:</strong> ${{ "{:,.0f}".format(closure.last_aum) }}</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">No closures this week</div>
-                {% endif %}
-            </div>
-            
-            <!-- Section 4: Issuer Scoreboard -->
-            <div class="section">
-                <h2 class="section-title">🏆 Issuer Scoreboard</h2>
-                {% if scoreboard %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Issuer</th>
-                                <th>Total Funds</th>
-                                <th>Total AUM</th>
-                                <th>WoW Change</th>
-                                <th>% Change</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for issuer in scoreboard %}
-                            <tr>
-                                <td><strong>{{ issuer.name }}</strong></td>
-                                <td>{{ issuer.fund_count }}</td>
-                                <td>${{ "{:,.0f}".format(issuer.total_aum) }}</td>
-                                <td class="{% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
-                                    {% if issuer.aum_change > 0 %}+{% endif %}${{ "{:,.0f}".format(issuer.aum_change) }}
-                                </td>
-                                <td class="{% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
-                                    {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <div class="empty-state">No scoreboard data available</div>
-                {% endif %}
-            </div>
-            
-            <!-- Section 5: AUM Movers -->
+            <!-- Section 1: AUM Movers -->
             <div class="section">
                 <h2 class="section-title">📈 Top AUM Movers</h2>
                 {% if top_gainers or top_losers %}
@@ -477,7 +383,82 @@
                 {% endif %}
             </div>
             
-            <!-- Section 6: Fund Count Changes -->
+            <!-- Section 2: Issuer Scoreboard -->
+            <div class="section">
+                <h2 class="section-title">🏆 Issuer Scoreboard</h2>
+                {% if scoreboard %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Issuer</th>
+                                <th>Total Funds</th>
+                                <th>Total AUM</th>
+                                <th>WoW Change</th>
+                                <th>% Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for issuer in scoreboard %}
+                            <tr>
+                                <td><strong>{{ issuer.name }}</strong></td>
+                                <td>{{ issuer.fund_count }}</td>
+                                <td>${{ "{:,.0f}".format(issuer.total_aum) }}</td>
+                                <td class="{% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
+                                    {% if issuer.aum_change > 0 %}+{% endif %}${{ "{:,.0f}".format(issuer.aum_change) }}
+                                </td>
+                                <td class="{% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
+                                    {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">No scoreboard data available</div>
+                {% endif %}
+            </div>
+
+            <!-- Section 3: New Launches -->
+            <div class="section">
+                <h2 class="section-title">🚀 New Launches</h2>
+                {% if launches %}
+                    {% for launch in launches %}
+                    <div class="card">
+                        <div class="card-title">{{ launch.ticker }}</div>
+                        <div class="card-meta"><strong>Name:</strong> {{ launch.name }}</div>
+                        <div class="card-meta"><strong>Issuer:</strong> {{ launch.issuer }}</div>
+                        <div class="card-meta"><strong>Launch Date:</strong> {{ launch.date }}</div>
+                        {% if launch.aum %}
+                        <div class="card-meta"><strong>Initial AUM:</strong> ${{ "{:,.0f}".format(launch.aum) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No new launches this week</div>
+                {% endif %}
+            </div>
+
+            <!-- Section 4: Closures & Delistings -->
+            <div class="section">
+                <h2 class="section-title">🔻 Closures & Delistings</h2>
+                {% if closures %}
+                    {% for closure in closures %}
+                    <div class="card">
+                        <div class="card-title">{{ closure.ticker }}</div>
+                        <div class="card-meta"><strong>Name:</strong> {{ closure.name }}</div>
+                        <div class="card-meta"><strong>Issuer:</strong> {{ closure.issuer }}</div>
+                        <div class="card-meta"><strong>Closure Date:</strong> {{ closure.date }}</div>
+                        {% if closure.last_aum %}
+                        <div class="card-meta"><strong>Last AUM:</strong> ${{ "{:,.0f}".format(closure.last_aum) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">No closures this week</div>
+                {% endif %}
+            </div>
+
+            <!-- Section 5: Fund Count Changes -->
             <div class="section">
                 <h2 class="section-title">📊 Fund Count Changes</h2>
                 {% if fund_count_changes %}
@@ -507,7 +488,26 @@
                     <div class="empty-state">No fund count changes this week</div>
                 {% endif %}
             </div>
-            
+
+            <!-- Section 6: Weekly Activity Log -->
+            <div class="section">
+                <h2 class="section-title">📅 Weekly Activity Log</h2>
+                {% if weekly_timeline %}
+                    <div class="timeline">
+                        {% for day in weekly_timeline %}
+                        <div class="timeline-item">
+                            <div class="timeline-date">{{ day.date }}</div>
+                            <div class="timeline-content">
+                                {{ day.launches }} launches, {{ day.closures }} closures, {{ day.aum_changes }} AUM changes
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">No activity recorded this week</div>
+                {% endif %}
+            </div>
+
             <!-- Section 7: Full Fund List (hidden in email body) -->
             {% if not is_email_body %}
             <div class="section">
