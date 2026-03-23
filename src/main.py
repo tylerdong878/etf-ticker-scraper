@@ -163,7 +163,11 @@ def scrape_mode(specific_issuer: Optional[str] = None) -> None:
                     for i, fund in enumerate(issuer_snapshot.funds):
                         if fund.ticker in fund_map:
                             issuer_snapshot.funds[i] = fund_map[fund.ticker]
-                
+
+                # Recalculate total_aum from enriched fund data
+                for issuer_snapshot in results.values():
+                    issuer_snapshot.total_aum = sum(f.aum for f in issuer_snapshot.funds if f.aum)
+
             except Exception as e:
                 logger.error(f"Failed to enrich with yfinance: {e}")
         
