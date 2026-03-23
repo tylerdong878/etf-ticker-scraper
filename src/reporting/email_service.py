@@ -155,15 +155,36 @@ def generate_report(
         # Sort by total AUM descending
         scoreboard.sort(key=lambda x: x['total_aum'], reverse=True)
     
-    # Top AUM movers
+    # Top AUM movers — net weekly change (current vs previous snapshot)
+    aum_movers = []
+    if previous_snapshot:
+        for issuer_slug, current_issuer in current_snapshot.issuers.items():
+            previous_issuer = previous_snapshot.issuers.get(issuer_slug)
+            if not previous_issuer:
+                continue
+            prev_funds = {f.ticker: f for f in previous_issuer.funds}
+            for fund in current_issuer.funds:
+                prev_fund = prev_funds.get(fund.ticker)
+                if prev_fund and fund.aum is not None and prev_fund.aum is not None:
+                    change = fund.aum - prev_fund.aum
+                    if change != 0:
+                        aum_movers.append({
+                            'ticker': fund.ticker,
+                            'issuer': issuer_slug,
+                            'prev_aum': prev_fund.aum,
+                            'current_aum': fund.aum,
+                            'change': change,
+                            'change_pct': change / prev_fund.aum,
+                        })
+
     top_gainers = sorted(
-        [m for m in all_aum_changes if m['change'] > 0],
+        [m for m in aum_movers if m['change'] > 0],
         key=lambda x: x['change'],
         reverse=True
     )[:10]
-    
+
     top_losers = sorted(
-        [m for m in all_aum_changes if m['change'] < 0],
+        [m for m in aum_movers if m['change'] < 0],
         key=lambda x: x['change']
     )[:10]
     
