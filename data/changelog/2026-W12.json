@@ -2,22 +2,7 @@
   {
     "date": "2026-03-16",
     "changes": {
-      "launches": [
-        {
-          "ticker": "PAAU",
-          "name": "T-REX 2X Long PAAS Daily Target ETF",
-          "issuer": "tuttle-capital-management",
-          "date": "2026-03-16",
-          "aum": null
-        },
-        {
-          "ticker": "SNDU",
-          "name": "T-REX 2X Long SNDK Daily Target ETF",
-          "issuer": "tuttle-capital-management",
-          "date": "2026-03-16",
-          "aum": null
-        }
-      ],
+      "launches": [],
       "closures": [],
       "aum_changes": [
         {
