@@ -280,8 +280,12 @@ def report_mode(dry_run: bool = False) -> None:
                 previous_snapshot = load_snapshot(previous_date)
                 logger.info(f"Using snapshot from {previous_date} for comparison")
         
-        # Step 3: Load this week's changelog
-        iso_year, iso_week, _ = current_date.isocalendar()
+        # Step 3: Load changelog — use previous week's if today is Monday (first day of ISO week),
+        # since all changes happened last week and this week's changelog only has today's entry.
+        iso_year, iso_week, iso_weekday = current_date.isocalendar()
+        if iso_weekday == 1:  # Monday
+            prev_week_date = current_date - timedelta(days=7)
+            iso_year, iso_week, _ = prev_week_date.isocalendar()
         week_str = f"{iso_year}-W{iso_week:02d}"
         changelog = load_weekly_changelog(week_str)
         
