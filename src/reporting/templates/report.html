@@ -363,12 +363,13 @@
             <div class="section">
                 <h2 class="section-title">📈 Top AUM Movers</h2>
                 {% if top_gainers or top_losers %}
-                    <h3 style="color: #059669; margin-bottom: 12px;">Top 10 Gainers</h3>
+                    <h3 style="color: #059669; margin-bottom: 12px;">Top 20 Gainers</h3>
                     {% if top_gainers %}
                         <table style="margin-bottom: 30px;">
                             <thead>
                                 <tr>
                                     <th>Ticker</th>
+                                    <th>Name</th>
                                     <th>Issuer</th>
                                     <th>Previous AUM</th>
                                     <th>Current AUM</th>
@@ -380,6 +381,7 @@
                                 {% for mover in top_gainers %}
                                 <tr>
                                     <td><strong>{{ mover.ticker }}</strong></td>
+                                    <td>{{ mover.name }}</td>
                                     <td>{{ mover.issuer }}</td>
                                     <td>${{ "{:,.0f}".format(mover.prev_aum) }}</td>
                                     <td>${{ "{:,.0f}".format(mover.current_aum) }}</td>
@@ -391,12 +393,13 @@
                         </table>
                     {% endif %}
                     
-                    <h3 style="color: #dc2626; margin-bottom: 12px;">Top 10 Losers</h3>
+                    <h3 style="color: #dc2626; margin-bottom: 12px;">Top 20 Losers</h3>
                     {% if top_losers %}
                         <table>
                             <thead>
                                 <tr>
                                     <th>Ticker</th>
+                                    <th>Name</th>
                                     <th>Issuer</th>
                                     <th>Previous AUM</th>
                                     <th>Current AUM</th>
@@ -408,6 +411,7 @@
                                 {% for mover in top_losers %}
                                 <tr>
                                     <td><strong>{{ mover.ticker }}</strong></td>
+                                    <td>{{ mover.name }}</td>
                                     <td>{{ mover.issuer }}</td>
                                     <td>${{ "{:,.0f}".format(mover.prev_aum) }}</td>
                                     <td>${{ "{:,.0f}".format(mover.current_aum) }}</td>

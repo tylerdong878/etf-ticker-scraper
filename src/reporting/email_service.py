@@ -170,6 +170,7 @@ def generate_report(
                     if change != 0:
                         aum_movers.append({
                             'ticker': fund.ticker,
+                            'name': fund.name,
                             'issuer': issuer_slug,
                             'prev_aum': prev_fund.aum,
                             'current_aum': fund.aum,
@@ -181,12 +182,12 @@ def generate_report(
         [m for m in aum_movers if m['change'] > 0],
         key=lambda x: x['change'],
         reverse=True
-    )[:10]
+    )[:20]
 
     top_losers = sorted(
         [m for m in aum_movers if m['change'] < 0],
         key=lambda x: x['change']
-    )[:10]
+    )[:20]
     
     # Fund count changes
     fund_count_changes = []
