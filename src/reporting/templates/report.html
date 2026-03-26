@@ -11,6 +11,10 @@
             box-sizing: border-box;
         }
         
+        @page {
+            margin: 10mm;
+        }
+
         /* Print styles for PDF generation */
         @media print {
             body {
@@ -71,14 +75,14 @@
         }
         
         .content {
-            padding: 20px;
+            padding: 10px;
         }
-        
+
         .section {
             margin-bottom: 40px;
             background: white;
             border-radius: 8px;
-            padding: 24px;
+            padding: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
@@ -270,6 +274,41 @@
             font-style: italic;
         }
         
+        .movers-table {
+            table-layout: fixed;
+        }
+
+        .movers-table th,
+        .movers-table td {
+            padding: 8px 6px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .movers-table th:nth-child(1),
+        .movers-table td:nth-child(1) { width: 6%; }
+
+        .movers-table th:nth-child(2),
+        .movers-table td:nth-child(2) {
+            white-space: normal;
+            width: 18%;
+        }
+
+        .movers-table th:nth-child(3),
+        .movers-table td:nth-child(3) { width: 15%; }
+
+        .movers-table th:nth-child(4),
+        .movers-table td:nth-child(4) { width: 15%; }
+
+        .movers-table th:nth-child(5),
+        .movers-table td:nth-child(5) { width: 15%; }
+
+        .movers-table th:nth-child(6),
+        .movers-table td:nth-child(6) { width: 15%; }
+
+        .movers-table th:nth-child(7),
+        .movers-table td:nth-child(7) { width: 9%; }
+
         .footer {
             background: #f8fafc;
             padding: 20px;
@@ -365,7 +404,7 @@
                 {% if top_gainers or top_losers %}
                     <h3 style="color: #059669; margin-bottom: 12px;">Top 20 Gainers</h3>
                     {% if top_gainers %}
-                        <table style="margin-bottom: 30px;">
+                        <table class="movers-table" style="margin-bottom: 30px;">
                             <thead>
                                 <tr>
                                     <th>Ticker</th>
@@ -395,7 +434,7 @@
                     
                     <h3 style="color: #dc2626; margin-bottom: 12px;">Top 20 Losers</h3>
                     {% if top_losers %}
-                        <table>
+                        <table class="movers-table">
                             <thead>
                                 <tr>
                                     <th>Ticker</th>
