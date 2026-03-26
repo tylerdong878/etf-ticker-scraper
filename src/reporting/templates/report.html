@@ -267,6 +267,44 @@
             min-width: 120px;
         }
         
+        .insights-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .insights-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .insights-list li:last-child {
+            border-bottom: none;
+        }
+
+        .insights-point {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .insights-source {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .insights-source a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .insights-source a:hover {
+            text-decoration: underline;
+        }
+
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -358,6 +396,23 @@
         </div>
         
         <div class="content">
+            <!-- Section 0: Weekly ETF Insights -->
+            {% if etf_insights %}
+            <div class="section">
+                <h2 class="section-title">🧠 Weekly ETF Insights</h2>
+                <ul class="insights-list">
+                    {% for item in etf_insights %}
+                    <li>
+                        <span class="insights-point">• {{ item.point }}</span>
+                        <span class="insights-source">
+                            Source: <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
             <!-- Section 1: New Launches -->
             <div class="section">
                 <h2 class="section-title">🚀 New Launches</h2>

@@ -20,6 +20,7 @@ from ..utils.config import (
     REPORTS_DIR, BASE_DIR
 )
 from ..utils.logger import get_logger
+from .gemini_insights import get_etf_insights
 
 logger = get_logger(__name__)
 
@@ -227,6 +228,9 @@ def generate_report(
         reverse=True
     )
     
+    # Fetch Gemini insights (gracefully skipped if API key missing or call fails)
+    etf_insights = get_etf_insights()
+
     # Render template
     html_content = template.render(
         report_date=current_snapshot.date,
@@ -239,6 +243,7 @@ def generate_report(
         top_losers=top_losers,
         fund_count_changes=fund_count_changes,
         fund_list=fund_list,
+        etf_insights=etf_insights,
         generation_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
         is_email_body=is_email_body
     )

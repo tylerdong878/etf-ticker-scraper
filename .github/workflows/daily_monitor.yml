@@ -73,6 +73,7 @@ jobs:
           echo "SEND_EMAIL=true" >> $GITHUB_ENV
           echo "DRY_RUN=false" >> $GITHUB_ENV
           echo "REPORT_FREQUENCY=weekly" >> $GITHUB_ENV
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> $GITHUB_ENV
       
       - name: Run ETF scraper
         run: |
