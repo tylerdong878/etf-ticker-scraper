@@ -62,6 +62,7 @@ RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL", "")
 
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+WATCHLIST_TICKERS = [t.strip().upper() for t in os.getenv("WATCHLIST_TICKERS", "").split(",") if t.strip()]
 
 # Directory paths
 DATA_DIR = BASE_DIR / "data"

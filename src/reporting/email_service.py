@@ -17,10 +17,10 @@ from weasyprint import HTML
 from ..utils.models import DailySnapshot
 from ..utils.config import (
     GMAIL_USER, GMAIL_APP_PASSWORD, RECIPIENT_EMAIL,
-    REPORTS_DIR, BASE_DIR
+    REPORTS_DIR, BASE_DIR, WATCHLIST_TICKERS
 )
 from ..utils.logger import get_logger
-from .gemini_insights import get_etf_insights
+from .gemini_insights import get_etf_insights, get_all_stock_insights
 
 logger = get_logger(__name__)
 
@@ -230,6 +230,7 @@ def generate_report(
     
     # Fetch Gemini insights (gracefully skipped if API key missing or call fails)
     etf_insights = get_etf_insights()
+    stock_insights = get_all_stock_insights(WATCHLIST_TICKERS) if WATCHLIST_TICKERS else []
 
     # Render template
     html_content = template.render(
@@ -244,6 +245,7 @@ def generate_report(
         fund_count_changes=fund_count_changes,
         fund_list=fund_list,
         etf_insights=etf_insights,
+        stock_insights=stock_insights,
         generation_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
         is_email_body=is_email_body
     )

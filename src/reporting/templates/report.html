@@ -405,11 +405,33 @@
                     <li>
                         <span class="insights-point">• {{ item.point }}</span>
                         <span class="insights-source">
-                            Source: <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>
+                            Source: <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>{% if item.source_date %} &mdash; {{ item.source_date }}{% endif %}
                         </span>
                     </li>
                     {% endfor %}
                 </ul>
+            </div>
+            {% endif %}
+
+            <!-- Section 0b: Stock Watchlist Insights -->
+            {% if stock_insights %}
+            <div class="section">
+                <h2 class="section-title">📌 Watchlist Stock Updates</h2>
+                {% for stock in stock_insights %}
+                <div style="margin-bottom: 24px;">
+                    <h3 style="color: #1e3a8a; font-size: 18px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb;">{{ stock.ticker }}</h3>
+                    <ul class="insights-list">
+                        {% for item in stock.insights %}
+                        <li>
+                            <span class="insights-point">• {{ item.point }}</span>
+                            <span class="insights-source">
+                                Source: <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>{% if item.source_date %} &mdash; {{ item.source_date }}{% endif %}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
             </div>
             {% endif %}
 
