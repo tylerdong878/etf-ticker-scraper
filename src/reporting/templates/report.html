@@ -32,12 +32,12 @@
             table {
                 page-break-inside: auto;
             }
-            
+
             tr {
                 page-break-inside: avoid;
                 page-break-after: auto;
             }
-            
+
             .issuer-group {
                 page-break-inside: avoid;
             }
@@ -160,7 +160,7 @@
             border-collapse: collapse;
             margin-top: 16px;
         }
-        
+
         th {
             background: #1e3a8a;
             color: white;
@@ -169,17 +169,37 @@
             font-weight: 600;
             font-size: 14px;
         }
-        
+
         td {
             padding: 12px;
             border-bottom: 1px solid #e5e7eb;
             font-size: 14px;
         }
-        
+
         tr:hover {
             background-color: #f8fafc;
         }
-        
+
+        .movers-table {
+            table-layout: fixed;
+        }
+
+        .movers-table th,
+        .movers-table td {
+            padding: 8px 6px;
+            font-size: 13px;
+            white-space: normal;
+        }
+
+        .movers-table th:nth-child(1),
+        .movers-table td:nth-child(1) { width: 22%; }
+
+        .movers-table th:nth-child(2),
+        .movers-table td:nth-child(2) { width: 10%; }
+
+        .movers-table th:nth-child(3),
+        .movers-table td:nth-child(3) { width: 68%; }
+
         .positive {
             color: #059669;
             font-weight: 600;
@@ -276,9 +296,6 @@
         .insights-list li {
             padding: 12px 0;
             border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
         }
 
         .insights-list li:last-child {
@@ -286,12 +303,15 @@
         }
 
         .insights-point {
+            display: block;
             font-size: 14px;
             color: #333;
             line-height: 1.5;
+            margin-bottom: 4px;
         }
 
         .insights-source {
+            display: block;
             font-size: 12px;
             color: #6b7280;
         }
@@ -312,41 +332,6 @@
             font-style: italic;
         }
         
-        .movers-table {
-            table-layout: fixed;
-        }
-
-        .movers-table th,
-        .movers-table td {
-            padding: 8px 6px;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .movers-table th:nth-child(1),
-        .movers-table td:nth-child(1) { width: 6%; }
-
-        .movers-table th:nth-child(2),
-        .movers-table td:nth-child(2) {
-            white-space: normal;
-            width: 18%;
-        }
-
-        .movers-table th:nth-child(3),
-        .movers-table td:nth-child(3) { width: 15%; }
-
-        .movers-table th:nth-child(4),
-        .movers-table td:nth-child(4) { width: 15%; }
-
-        .movers-table th:nth-child(5),
-        .movers-table td:nth-child(5) { width: 15%; }
-
-        .movers-table th:nth-child(6),
-        .movers-table td:nth-child(6) { width: 15%; }
-
-        .movers-table th:nth-child(7),
-        .movers-table td:nth-child(7) { width: 9%; }
-
         .footer {
             background: #f8fafc;
             padding: 20px;
@@ -372,16 +357,16 @@
             table {
                 font-size: 12px;
             }
-            
+
             th, td {
                 padding: 8px;
             }
-            
+
             .fund-item {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .fund-aum {
                 margin-top: 4px;
             }
@@ -392,7 +377,7 @@
     <div class="container">
         <div class="header">
             <h1>📊 ETF Ticker Scraper Report</h1>
-            <p>{{ report_date }} | Week {{ week_number }}</p>
+            <p>{{ report_date }} | Week {{ week_number }} | {{ week_date_range }}</p>
         </div>
         
         <div class="content">
@@ -481,7 +466,27 @@
                 {% if top_gainers or top_losers %}
                     <h3 style="color: #059669; margin-bottom: 12px;">Top 20 Gainers</h3>
                     {% if top_gainers %}
+                        {% if is_email_body %}
                         <table class="movers-table" style="margin-bottom: 30px;">
+                            <thead>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Issuer</th>
+                                    <th>AUM Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mover in top_gainers %}
+                                <tr>
+                                    <td><strong>{{ mover.ticker }}</strong><br><span style="font-weight: 400; font-size: 11px; color: #666;">{{ mover.name }}</span></td>
+                                    <td>{{ mover.issuer }}</td>
+                                    <td>{{ mover.prev_aum | compact_aum }} → {{ mover.current_aum | compact_aum }} | <span class="positive">+{{ mover.change | compact_aum }} (+{{ "{:.2f}".format(mover.change_pct * 100) }}%)</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <table style="margin-bottom: 30px;">
                             <thead>
                                 <tr>
                                     <th>Ticker</th>
@@ -499,19 +504,40 @@
                                     <td><strong>{{ mover.ticker }}</strong></td>
                                     <td>{{ mover.name }}</td>
                                     <td>{{ mover.issuer }}</td>
-                                    <td>${{ "{:,.0f}".format(mover.prev_aum) }}</td>
-                                    <td>${{ "{:,.0f}".format(mover.current_aum) }}</td>
-                                    <td class="positive">+${{ "{:,.0f}".format(mover.change) }}</td>
-                                    <td class="positive">+{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
+                                    <td>{{ mover.prev_aum | compact_aum }}</td>
+                                    <td>{{ mover.current_aum | compact_aum }}</td>
+                                    <td class="positive" style="white-space: nowrap;">+{{ mover.change | compact_aum }}</td>
+                                    <td class="positive" style="white-space: nowrap;">+{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                        {% endif %}
                     {% endif %}
-                    
+
                     <h3 style="color: #dc2626; margin-bottom: 12px;">Top 20 Losers</h3>
                     {% if top_losers %}
+                        {% if is_email_body %}
                         <table class="movers-table">
+                            <thead>
+                                <tr>
+                                    <th>Ticker</th>
+                                    <th>Issuer</th>
+                                    <th>AUM Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mover in top_losers %}
+                                <tr>
+                                    <td><strong>{{ mover.ticker }}</strong><br><span style="font-weight: 400; font-size: 11px; color: #666;">{{ mover.name }}</span></td>
+                                    <td>{{ mover.issuer }}</td>
+                                    <td>{{ mover.prev_aum | compact_aum }} → {{ mover.current_aum | compact_aum }} | <span class="negative">{{ mover.change | compact_aum }} ({{ "{:.2f}".format(mover.change_pct * 100) }}%)</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <table>
                             <thead>
                                 <tr>
                                     <th>Ticker</th>
@@ -529,14 +555,15 @@
                                     <td><strong>{{ mover.ticker }}</strong></td>
                                     <td>{{ mover.name }}</td>
                                     <td>{{ mover.issuer }}</td>
-                                    <td>${{ "{:,.0f}".format(mover.prev_aum) }}</td>
-                                    <td>${{ "{:,.0f}".format(mover.current_aum) }}</td>
-                                    <td class="negative">${{ "{:,.0f}".format(mover.change) }}</td>
-                                    <td class="negative">{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
+                                    <td>{{ mover.prev_aum | compact_aum }}</td>
+                                    <td>{{ mover.current_aum | compact_aum }}</td>
+                                    <td class="negative" style="white-space: nowrap;">{{ mover.change | compact_aum }}</td>
+                                    <td class="negative" style="white-space: nowrap;">{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                        {% endif %}
                     {% endif %}
                 {% else %}
                     <div class="empty-state">No AUM movement data available</div>
@@ -562,9 +589,9 @@
                             <tr>
                                 <td><strong>{{ issuer.name }}</strong></td>
                                 <td>{{ issuer.fund_count }}</td>
-                                <td>${{ "{:,.0f}".format(issuer.total_aum) }}</td>
+                                <td>{{ issuer.total_aum | compact_aum }}</td>
                                 <td class="{% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
-                                    {% if issuer.aum_change > 0 %}+{% endif %}${{ "{:,.0f}".format(issuer.aum_change) }}
+                                    {% if issuer.aum_change > 0 %}+{% endif %}{{ issuer.aum_change | compact_aum }}
                                 </td>
                                 <td class="{% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
                                     {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%

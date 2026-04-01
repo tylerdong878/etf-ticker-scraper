@@ -16,9 +16,10 @@ from .detection.snapshot_manager import (
 from .detection.change_detector import detect_changes, append_to_changelog, load_weekly_changelog
 from .enrichment.yahoo_finance import enrich_funds
 from .reporting.email_service import generate_report, send_email, save_report_locally, generate_pdf
+from .reporting.gemini_insights import get_etf_insights, get_all_stock_insights
 from .utils.models import DailySnapshot, IssuerSnapshot
 from .utils.config import (
-    ENRICH_WITH_YFINANCE, SEND_EMAIL, DRY_RUN, REPORT_FREQUENCY
+    ENRICH_WITH_YFINANCE, SEND_EMAIL, DRY_RUN, REPORT_FREQUENCY, WATCHLIST_TICKERS
 )
 from .utils.logger import get_logger
 
@@ -291,24 +292,32 @@ def report_mode(dry_run: bool = False) -> None:
         
         logger.info(f"Loaded changelog for week {week_str}: {len(changelog)} entries")
         
-        # Step 4: Generate full HTML report for local save
+        # Step 4: Fetch Gemini insights once
+        logger.info("Fetching Gemini insights...")
+        etf_insights = get_etf_insights()
+        stock_insights = get_all_stock_insights(WATCHLIST_TICKERS) if WATCHLIST_TICKERS else []
+
+        # Step 5: Generate full HTML report for local save
         full_html_content = generate_report(
             current_snapshot,
             previous_snapshot,
             changelog,
-            is_email_body=False
+            is_email_body=False,
+            etf_insights=etf_insights,
+            stock_insights=stock_insights
         )
-        
-        # Step 5: Save full report locally (always)
+
+        # Step 6: Save full report locally (always)
         save_report_locally(full_html_content, current_snapshot.date)
-        
-        # Step 6: Send email if enabled and not dry-run
+
+        # Step 7: Send email if enabled and not dry-run
         if SEND_EMAIL and not dry_run and not DRY_RUN:
             subject = f"ETF Ticker Scraper Report - {current_snapshot.date}"
             if report_type == "daily":
                 subject = f"Daily ETF Update - {current_snapshot.date}"
-            
-            success = send_email(current_snapshot, previous_snapshot, changelog, subject)
+
+            success = send_email(current_snapshot, previous_snapshot, changelog, subject,
+                                 etf_insights=etf_insights, stock_insights=stock_insights)
             if success:
                 logger.info("Report email sent successfully")
             else:

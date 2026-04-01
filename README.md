@@ -1,18 +1,18 @@
 # ETF Ticker Scraper
 
-Automated system for tracking ETF launches, closures, and market changes across 15 major issuers. Generates weekly reports with executive summaries and detailed PDF attachments.
+Automated system for tracking ETF launches, closures, and market changes across 16 major issuers. Generates weekly reports with executive summaries, Gemini-powered market insights, and detailed PDF attachments.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- **Multi-Source Scraping**: Collects data from 15 ETF issuers (11 via StockAnalysis.com, 4 direct websites)
+- **Multi-Source Scraping**: Collects data from 16 ETF issuers (11 via StockAnalysis.com, 5 direct websites)
 - **Change Detection**: Automatically identifies launches, closures, and AUM changes
 - **Market Enrichment**: Enhances data with yfinance (NAV, volume, inception dates)
+- **Gemini Insights**: Weekly ETF industry news and watchlist stock updates via Gemini API with Google Search grounding
 - **Smart Reporting**: Generates HTML reports with PDF attachments
 - **GitHub Actions**: Automated daily scraping and weekly reports
-- **Comprehensive Testing**: 100% test coverage on core logic
 
 ## Project Structure
 
@@ -79,6 +79,10 @@ REPORT_FREQUENCY=weekly  # daily, weekly, or both
 GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASSWORD=your-app-password
 RECIPIENT_EMAIL=recipient@example.com
+
+# Gemini (optional — insights are skipped if not set)
+GEMINI_API_KEY=your-gemini-api-key
+WATCHLIST_TICKERS=  # comma-separated tickers for stock insights
 ```
 
 ## Usage
@@ -125,11 +129,12 @@ pytest --cov=src
 - Roundhill, REX Microsectors, Tuttle Capital Management
 - Defiance, Simplify, TRADR
 
-### Direct Websites (4 Issuers)
+### Direct Websites (5 Issuers)
 - **Kurv**: https://www.kurvinvest.com/etfs
 - **Volatility Shares**: https://www.volatilityshares.com/etf-product-list.php
 - **REX Shares**: https://www.rexshares.com/home/all-funds/
 - **Leverage Shares**: https://leverageshares.com/us/all-etfs/
+- **BMO MAX**: https://www.maxetns.com/
 
 ### New Launches
 - Monitors StockAnalysis.com's new ETF list for launches from tracked issuers
@@ -143,6 +148,8 @@ pytest --cov=src
 4. Issuer Scoreboard (WoW changes)
 5. Top AUM Movers (gainers/losers)
 6. Fund Count Changes
+7. ETF Industry Insights (Gemini-powered, sourced from the past week)
+8. Watchlist Stock Insights (per-ticker news for configured tickers)
 
 ### PDF Attachment (Full Report)
 - All sections above PLUS

@@ -6,7 +6,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 from io import BytesIO
@@ -79,16 +79,20 @@ def generate_report(
     current_snapshot: DailySnapshot,
     previous_snapshot: Optional[DailySnapshot],
     changelog: list[dict],
-    is_email_body: bool = False
+    is_email_body: bool = False,
+    etf_insights: Optional[list] = None,
+    stock_insights: Optional[list] = None
 ) -> str:
     """
     Generate HTML report from snapshots and changelog data.
-    
+
     Args:
         current_snapshot: Current day's snapshot
         previous_snapshot: Previous snapshot for comparison (can be None for first run)
         changelog: List of daily change entries for the week
         is_email_body: If True, excludes Full Fund List section for email body
+        etf_insights: Pre-fetched ETF insights (fetched if None)
+        stock_insights: Pre-fetched stock insights (fetched if None)
     
     Returns:
         HTML string of the generated report
@@ -98,11 +102,31 @@ def generate_report(
     # Set up Jinja2 environment
     template_dir = BASE_DIR / "src" / "reporting" / "templates"
     env = Environment(loader=FileSystemLoader(template_dir))
+
+    def compact_aum(value):
+        """Format AUM as compact string: $1.31B, $160M, $45K"""
+        if value is None:
+            return "N/A"
+        abs_val = abs(value)
+        sign = "-" if value < 0 else ""
+        if abs_val >= 1_000_000_000:
+            return f"{sign}${abs_val / 1_000_000_000:,.2f}B"
+        elif abs_val >= 1_000_000:
+            return f"{sign}${abs_val / 1_000_000:,.2f}M"
+        elif abs_val >= 1_000:
+            return f"{sign}${abs_val / 1_000:,.1f}K"
+        else:
+            return f"{sign}${abs_val:,.0f}"
+
+    env.filters['compact_aum'] = compact_aum
     template = env.get_template("report.html")
     
-    # Parse date and get week number
+    # Parse date and get week number with date range
     date_obj = datetime.strptime(current_snapshot.date, "%Y-%m-%d")
     week_number = date_obj.isocalendar()[1]
+    week_start = date_obj - timedelta(days=date_obj.weekday())  # Monday
+    week_end = week_start + timedelta(days=6)  # Sunday
+    week_date_range = f"{week_start.strftime('%b %d')}–{week_end.strftime('%d')}"
     
     # Build weekly timeline from changelog
     weekly_timeline = []
@@ -228,14 +252,17 @@ def generate_report(
         reverse=True
     )
     
-    # Fetch Gemini insights (gracefully skipped if API key missing or call fails)
-    etf_insights = get_etf_insights()
-    stock_insights = get_all_stock_insights(WATCHLIST_TICKERS) if WATCHLIST_TICKERS else []
+    # Fetch Gemini insights if not provided (gracefully skipped if API key missing or call fails)
+    if etf_insights is None:
+        etf_insights = get_etf_insights()
+    if stock_insights is None:
+        stock_insights = get_all_stock_insights(WATCHLIST_TICKERS) if WATCHLIST_TICKERS else []
 
     # Render template
     html_content = template.render(
         report_date=current_snapshot.date,
         week_number=week_number,
+        week_date_range=week_date_range,
         weekly_timeline=weekly_timeline,
         launches=all_launches,
         closures=all_closures,
@@ -282,7 +309,9 @@ def send_email(
     current_snapshot: DailySnapshot,
     previous_snapshot: Optional[DailySnapshot],
     changelog: list[dict],
-    subject: str
+    subject: str,
+    etf_insights: Optional[list] = None,
+    stock_insights: Optional[list] = None
 ) -> bool:
     """
     Send email with executive summary HTML body and full report PDF attachment.
@@ -301,22 +330,34 @@ def send_email(
         return False
     
     try:
+        # Fetch Gemini insights if not provided
+        if etf_insights is None or stock_insights is None:
+            logger.info("Fetching Gemini insights...")
+            if etf_insights is None:
+                etf_insights = get_etf_insights()
+            if stock_insights is None:
+                stock_insights = get_all_stock_insights(WATCHLIST_TICKERS) if WATCHLIST_TICKERS else []
+
         # Generate email body (executive summary without full fund list)
         logger.info("Generating executive summary for email body...")
         email_body_html = generate_report(
             current_snapshot,
             previous_snapshot,
             changelog,
-            is_email_body=True
+            is_email_body=True,
+            etf_insights=etf_insights,
+            stock_insights=stock_insights
         )
-        
+
         # Generate full report HTML for PDF
         logger.info("Generating full report for PDF attachment...")
         full_report_html = generate_report(
             current_snapshot,
             previous_snapshot,
             changelog,
-            is_email_body=False
+            is_email_body=False,
+            etf_insights=etf_insights,
+            stock_insights=stock_insights
         )
         
         # Convert full report to PDF
