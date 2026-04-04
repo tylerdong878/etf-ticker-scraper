@@ -27,6 +27,11 @@ STOCKANALYSIS_ISSUERS = {
     "defiance": "https://stockanalysis.com/etf/provider/defiance/",
     "simplify": "https://stockanalysis.com/etf/provider/simplify/",
     "tradr": "https://stockanalysis.com/etf/provider/tradr/",
+    "global-x": "https://stockanalysis.com/etf/provider/global-x/",
+    "kraneshares": "https://stockanalysis.com/etf/provider/kraneshares/",
+    "bitwise": "https://stockanalysis.com/etf/provider/bitwise/",
+    "grayscale": "https://stockanalysis.com/etf/provider/grayscale/",
+    "ark": "https://stockanalysis.com/etf/provider/ark/",
 }
 
 # Issuers scraped from their own websites (4 issuers)
