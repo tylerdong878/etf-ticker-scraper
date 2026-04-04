@@ -322,7 +322,7 @@
 
         .fund-item {
             display: grid;
-            grid-template-columns: 72px 1fr 110px;
+            grid-template-columns: 72px 1fr 70px 90px 110px;
             gap: 8px;
             padding: 5px 0;
             border-bottom: 1px solid #f3f4f6;
@@ -681,10 +681,21 @@
                         <span>{{ issuer_group.name }}</span>
                         <span class="fund-count">{{ issuer_group.fund_count }} funds</span>
                     </div>
+                    <div class="fund-item" style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9ca3af;padding-bottom:4px;border-bottom:1px solid #e5e7eb;">
+                        <span>Ticker</span><span>Name</span><span style="text-align:right;">Fee</span><span style="text-align:right;">Est. Revenue</span><span style="text-align:right;">AUM</span>
+                    </div>
                     {% for fund in issuer_group.funds %}
                     <div class="fund-item">
                         <span class="fund-ticker">{{ fund.ticker }}</span>
                         <span class="fund-name">{{ fund.name }}</span>
+                        <span class="fund-aum">
+                            {% if fund.expense_ratio %}{{ "{:.2f}".format(fund.expense_ratio * 100) }}%{% else %}—{% endif %}
+                        </span>
+                        <span class="fund-aum">
+                            {% if fund.aum and fund.expense_ratio %}
+                                ${{ "{:,.0f}".format(fund.aum * fund.expense_ratio) }}
+                            {% else %}—{% endif %}
+                        </span>
                         <span class="fund-aum">
                             {% if fund.aum %}${{ "{:,.0f}".format(fund.aum) }}{% else %}N/A{% endif %}
                         </span>

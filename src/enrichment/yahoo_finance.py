@@ -121,11 +121,15 @@ def _fetch_ticker_data(ticker: str) -> dict:
         # Extract total assets (AUM)
         total_assets = info.get('totalAssets')
 
+        # Extract expense ratio (returned as decimal, e.g. 0.0095 for 0.95%)
+        expense_ratio = info.get('annualReportExpenseRatio') or info.get('expenseRatio')
+
         return {
             "nav": nav,
             "volume": volume,
             "inception_date": inception_date,
-            "total_assets": total_assets
+            "total_assets": total_assets,
+            "expense_ratio": expense_ratio
         }
 
     except Exception as e:
@@ -170,6 +174,7 @@ def enrich_funds(funds: list[ETFund]) -> list[ETFund]:
             fund.nav = cached_data.get("nav")
             fund.volume = cached_data.get("volume")
             fund.inception_date = cached_data.get("inception_date")
+            fund.expense_ratio = cached_data.get("expense_ratio")
             if not fund.aum:
                 total_assets = cached_data.get("total_assets")
                 if total_assets:
@@ -187,6 +192,7 @@ def enrich_funds(funds: list[ETFund]) -> list[ETFund]:
         fund.nav = data["nav"]
         fund.volume = data["volume"]
         fund.inception_date = data["inception_date"]
+        fund.expense_ratio = data.get("expense_ratio")
         if not fund.aum:
             total_assets = data.get("total_assets")
             if total_assets:
