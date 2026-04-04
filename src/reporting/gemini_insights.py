@@ -130,6 +130,10 @@ def get_etf_insights() -> list[dict] | None:
             config=config
         )
 
+        if not response.text:
+            logger.warning("Gemini returned empty response for ETF insights")
+            return None
+
         insights = _parse_json_response(response.text)
         if not insights:
             logger.warning("Gemini returned unexpected format for ETF insights. Raw response: %s", response.text[:1500])
@@ -232,6 +236,9 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
         config=config
     )
 
+    if not response.text:
+        raise ValueError("Gemini returned empty response for batch")
+
     text = response.text.strip()
     if text.startswith("```"):
         parts = text.split("```")
@@ -240,22 +247,34 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
             inner = inner[4:]
         text = inner.strip()
 
+    # Extract the first complete {...} block in case the model appended trailing text
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        text = text[start:end + 1]
+
     parsed = json.loads(text)
     if not isinstance(parsed, dict):
         raise ValueError("Expected a JSON object keyed by ticker")
+
+    returned_keys = list(parsed.keys())
+    logger.debug(f"Batch response keys: {returned_keys}")
 
     results = []
     for ticker in tickers:
         raw = parsed.get(ticker) or parsed.get(ticker.upper()) or parsed.get(ticker.lower())
         if not isinstance(raw, list):
+            logger.warning(f"Batch: no entry for {ticker} — model returned keys: {returned_keys}")
             continue
         insights = _validate_items(raw)
         if insights:
             results.append({'ticker': ticker, 'insights': insights[:3]})
+        else:
+            logger.warning(f"Batch: {ticker} returned {len(raw)} item(s) but none passed validation (raw: {raw})")
     return results
 
 
-def get_all_stock_insights(tickers: list[str], batch_size: int = 5) -> list[dict]:
+def get_all_stock_insights(tickers: list[str], batch_size: int = 4) -> list[dict]:
     """
     Returns a list of {ticker, insights} dicts for each ticker in the watchlist.
     Tickers are processed in batches of batch_size (default 5) to balance
