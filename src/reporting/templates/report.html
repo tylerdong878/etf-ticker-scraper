@@ -594,6 +594,8 @@
                         <th style="text-align:right;">Total AUM</th>
                         <th style="text-align:right;">WoW Change</th>
                         <th style="text-align:right;">%</th>
+                        <th style="text-align:right;">Avg Fee</th>
+                        <th style="text-align:right;">Est. Revenue</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -607,6 +609,12 @@
                         </td>
                         <td style="text-align:right;" class="num {% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
                             {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
+                        </td>
+                        <td style="text-align:right;" class="num">
+                            {% if issuer.avg_fee %}{{ "{:.2f}".format(issuer.avg_fee * 100) }}%{% else %}—{% endif %}
+                        </td>
+                        <td style="text-align:right;" class="num">
+                            {% if issuer.total_revenue %}{{ issuer.total_revenue | compact_aum }}{% else %}—{% endif %}
                         </td>
                     </tr>
                     {% endfor %}

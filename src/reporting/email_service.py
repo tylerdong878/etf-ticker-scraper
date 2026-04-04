@@ -169,12 +169,23 @@ def generate_report(
                 aum_change = 0
                 aum_change_pct = 0
             
+            # AUM-weighted average fee and total estimated annual revenue
+            funds_with_fee = [f for f in current_issuer.funds if f.aum and f.expense_ratio]
+            weighted_aum = sum(f.aum for f in funds_with_fee)
+            avg_fee = (
+                sum(f.aum * f.expense_ratio for f in funds_with_fee) / weighted_aum
+                if weighted_aum else None
+            )
+            total_revenue = sum(f.aum * f.expense_ratio for f in funds_with_fee) if funds_with_fee else None
+
             scoreboard.append({
                 'name': issuer_slug,
                 'fund_count': current_issuer.total_funds,
                 'total_aum': current_issuer.total_aum,
                 'aum_change': aum_change,
-                'aum_change_pct': aum_change_pct
+                'aum_change_pct': aum_change_pct,
+                'avg_fee': avg_fee,
+                'total_revenue': total_revenue
             })
         
         # Merge REX issuers
