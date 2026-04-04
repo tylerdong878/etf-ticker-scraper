@@ -126,7 +126,10 @@ def generate_report(
     week_number = date_obj.isocalendar()[1]
     week_start = date_obj - timedelta(days=date_obj.weekday())  # Monday
     week_end = week_start + timedelta(days=6)  # Sunday
-    week_date_range = f"{week_start.strftime('%b %d')}–{week_end.strftime('%d')}"
+    if week_start.month == week_end.month:
+        week_date_range = f"{week_start.strftime('%b %d')}–{week_end.strftime('%d')}"
+    else:
+        week_date_range = f"{week_start.strftime('%b %d')}–{week_end.strftime('%b %d')}"
     
     # Build weekly timeline from changelog
     weekly_timeline = []

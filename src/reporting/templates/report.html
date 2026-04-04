@@ -3,695 +3,708 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETF Ticker Scraper Report - {{ report_date }}</title>
+    <title>ETF Intelligence Report — {{ report_date }}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        @page {
-            margin: 10mm;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Print styles for PDF generation */
+        @page { margin: 14mm 12mm; }
+
         @media print {
-            body {
-                background-color: white;
-            }
-            
-            .section {
-                page-break-inside: avoid;
-            }
-            
-            .header {
-                page-break-after: avoid;
-            }
-            
-            table {
-                page-break-inside: auto;
-            }
-
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            .issuer-group {
-                page-break-inside: avoid;
-            }
+            body { background: white; }
+            .section { page-break-inside: avoid; }
+            .issuer-group-header { page-break-after: avoid; }
+            tr { page-break-inside: avoid; }
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .content {
-            padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #1a1a1a;
+            background: #f5f4f0;
         }
 
-        .section {
-            margin-bottom: 40px;
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
             background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        
-        .section-title {
-            font-size: 24px;
+
+        /* ── Header ── */
+        .header {
+            background: #1e3a8a;
+            color: white;
+            padding: 32px 36px 28px;
+            border-bottom: 4px solid #1e40af;
+        }
+
+        .header-eyebrow {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 8px;
+        }
+
+        .header-title {
+            font-size: 26px;
             font-weight: 700;
-            color: #1e3a8a;
-            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+            color: white;
+            margin-bottom: 14px;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .header-meta-item {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .header-meta-item strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ── Content ── */
+        .content { padding: 0 24px 32px; }
+
+        /* ── Section ── */
+        .section { margin-top: 32px; }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f1117;
+            margin-bottom: 16px;
             padding-bottom: 10px;
-            border-bottom: 3px solid #3b82f6;
+            border-bottom: 1px solid #e5e7eb;
+            letter-spacing: -0.01em;
         }
-        
-        .timeline {
-            border-left: 3px solid #3b82f6;
-            padding-left: 20px;
-            margin-left: 10px;
+
+        /* ── Insights ── */
+        .insights-list { list-style: none; }
+
+        .insights-list li {
+            padding: 11px 0;
+            border-bottom: 1px solid #f0f0ee;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3px;
         }
-        
-        .timeline-item {
-            margin-bottom: 20px;
-            position: relative;
+
+        .insights-list li:last-child { border-bottom: none; }
+
+        .insight-point {
+            font-size: 13px;
+            color: #1a1a1a;
+            line-height: 1.5;
         }
-        
+
+        .insight-source {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .insight-source a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .insight-source a:hover { text-decoration: underline; }
+
+        /* ── Watchlist ── */
+        .watchlist-stock { margin-bottom: 20px; }
+
+        .watchlist-ticker {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #2563eb;
+            text-transform: uppercase;
+            font-family: "SF Mono", "Consolas", "Monaco", monospace;
+            margin-bottom: 6px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* ── Launches / Closures table ── */
+        .launch-table, .closure-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .launch-table th, .closure-table th {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6b7280;
+            padding: 6px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            background: none;
+        }
+
+        .launch-table td, .closure-table td {
+            padding: 9px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 12.5px;
+            color: #1a1a1a;
+            vertical-align: top;
+        }
+
+        .launch-table tr:last-child td,
+        .closure-table tr:last-child td { border-bottom: none; }
+
+        .ticker-cell {
+            font-family: "SF Mono", "Consolas", "Monaco", monospace;
+            font-weight: 700;
+            font-size: 12px;
+            color: #0f1117;
+            white-space: nowrap;
+        }
+
+        .issuer-cell {
+            font-size: 11px;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        /* ── Data tables ── */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+
+        table.data-table td:nth-child(2) { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        table.data-table th {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6b7280;
+            padding: 7px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            background: none;
+            white-space: nowrap;
+        }
+
+        table.data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 12.5px;
+            color: #1a1a1a;
+            vertical-align: middle;
+        }
+
+        table.data-table tbody tr:last-child td { border-bottom: none; }
+
+        table.data-table tbody tr:hover { background: #fafaf9; }
+
+        .num { font-family: "SF Mono", "Consolas", "Monaco", monospace; font-size: 12px; white-space: nowrap; }
+
+        .positive, table.data-table td.positive, table.scoreboard-table td.positive { color: #059669; font-weight: 600; }
+        .negative, table.data-table td.negative, table.scoreboard-table td.negative { color: #dc2626; font-weight: 600; }
+        .neutral,  table.data-table td.neutral,  table.scoreboard-table td.neutral  { color: #6b7280; }
+
+        /* sub-header row between gainers/losers */
+        .table-subheader {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #374151;
+            margin: 20px 0 8px;
+            text-transform: uppercase;
+        }
+
+        .table-subheader.gains { color: #047857; }
+        .table-subheader.losses { color: #b91c1c; }
+
+        /* ── Scoreboard ── */
+        .scoreboard-table { width: 100%; border-collapse: collapse; }
+
+        .scoreboard-table th {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6b7280;
+            padding: 7px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            background: none;
+        }
+
+        .scoreboard-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 12.5px;
+            vertical-align: middle;
+        }
+
+        .scoreboard-table tbody tr:last-child td { border-bottom: none; }
+        .scoreboard-table tbody tr:hover { background: #fafaf9; }
+
+        .issuer-name {
+            font-weight: 600;
+            color: #0f1117;
+            text-transform: capitalize;
+        }
+
+        /* ── Timeline ── */
+        .timeline { border-left: 2px solid #e5e7eb; margin-left: 6px; padding-left: 20px; }
+
+        .timeline-item { margin-bottom: 14px; position: relative; }
+
         .timeline-item::before {
             content: '';
             position: absolute;
             left: -26px;
             top: 5px;
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #3b82f6;
-            border: 3px solid white;
-            box-shadow: 0 0 0 2px #3b82f6;
+            background: #d1d5db;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #d1d5db;
         }
-        
+
         .timeline-date {
+            font-size: 11px;
             font-weight: 700;
-            color: #1e3a8a;
-            margin-bottom: 5px;
+            letter-spacing: 0.04em;
+            color: #374151;
+            margin-bottom: 2px;
+            font-family: "SF Mono", "Consolas", "Monaco", monospace;
         }
-        
-        .timeline-content {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .card {
-            background: #f8fafc;
-            border-left: 4px solid #3b82f6;
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 4px;
-        }
-        
-        .card-title {
+
+        .timeline-content { font-size: 12px; color: #6b7280; }
+
+        /* ── Fund List ── */
+        .issuer-group { margin-bottom: 24px; }
+
+        .issuer-group-header {
+            font-size: 10px;
             font-weight: 700;
-            color: #1e3a8a;
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-        
-        .card-meta {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-        
-        .card-meta strong {
-            color: #333;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-
-        th {
-            background: #1e3a8a;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .movers-table {
-            table-layout: fixed;
-        }
-
-        .movers-table th,
-        .movers-table td {
-            padding: 8px 6px;
-            font-size: 13px;
-            white-space: normal;
-        }
-
-        .movers-table th:nth-child(1),
-        .movers-table td:nth-child(1) { width: 22%; }
-
-        .movers-table th:nth-child(2),
-        .movers-table td:nth-child(2) { width: 10%; }
-
-        .movers-table th:nth-child(3),
-        .movers-table td:nth-child(3) { width: 68%; }
-
-        .positive {
-            color: #059669;
-            font-weight: 600;
-        }
-        
-        .negative {
-            color: #dc2626;
-            font-weight: 600;
-        }
-        
-        .neutral {
-            color: #6b7280;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .badge-success {
-            background: #d1fae5;
-            color: #059669;
-        }
-        
-        .badge-danger {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        
-        .badge-info {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-        
-        .issuer-group {
-            margin-bottom: 30px;
-        }
-        
-        .issuer-header {
-            background: #1e3a8a;
-            color: white;
-            padding: 12px 16px;
-            font-weight: 700;
-            font-size: 16px;
-            border-radius: 4px 4px 0 0;
-        }
-        
-        .fund-list {
-            background: #f8fafc;
-            padding: 16px;
-            border-radius: 0 0 4px 4px;
-        }
-        
-        .fund-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e7eb;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #374151;
+            padding: 7px 0;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 2px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
-        .fund-item:last-child {
-            border-bottom: none;
-        }
-        
-        .fund-ticker {
-            font-weight: 700;
-            color: #1e3a8a;
-            min-width: 80px;
-        }
-        
-        .fund-name {
-            flex: 1;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .fund-aum {
-            color: #666;
-            font-size: 13px;
-            text-align: right;
-            min-width: 120px;
-        }
-        
-        .insights-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
 
-        .insights-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .insights-list li:last-child {
-            border-bottom: none;
-        }
-
-        .insights-point {
-            display: block;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 4px;
-        }
-
-        .insights-source {
-            display: block;
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        .insights-source a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-
-        .insights-source a:hover {
-            text-decoration: underline;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
+        .issuer-group-header .fund-count {
+            font-weight: 400;
             color: #9ca3af;
+        }
+
+        .fund-item {
+            display: grid;
+            grid-template-columns: 72px 1fr 110px;
+            gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f3f4f6;
+            align-items: center;
+        }
+
+        .fund-item:last-child { border-bottom: none; }
+
+        .fund-ticker {
+            font-family: "SF Mono", "Consolas", "Monaco", monospace;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #0f1117;
+        }
+
+        .fund-name { font-size: 12px; color: #374151; }
+
+        .fund-aum {
+            font-family: "SF Mono", "Consolas", "Monaco", monospace;
+            font-size: 11.5px;
+            color: #6b7280;
+            text-align: right;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            font-size: 12px;
+            color: #9ca3af;
+            padding: 20px 0;
             font-style: italic;
         }
-        
+
+        /* ── Footer ── */
         .footer {
-            background: #f8fafc;
-            padding: 20px;
-            text-align: center;
-            color: #6b7280;
-            font-size: 13px;
+            margin-top: 40px;
+            padding: 16px 24px;
             border-top: 1px solid #e5e7eb;
+            font-size: 11px;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
         }
-        
+
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .section {
-                padding: 16px;
-            }
-            
-            .section-title {
-                font-size: 20px;
-            }
-            
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px;
-            }
-
-            .fund-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .fund-aum {
-                margin-top: 4px;
-            }
+            .header { padding: 20px; }
+            .content { padding: 0 12px 24px; }
+            .header-meta { flex-direction: column; gap: 8px; }
+            .fund-item { grid-template-columns: 64px 1fr; }
+            .fund-aum { display: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📊 ETF Ticker Scraper Report</h1>
-            <p>{{ report_date }} | Week {{ week_number }} | {{ week_date_range }}</p>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-eyebrow">ETF Report</div>
+        <div class="header-title">Weekly Market Brief</div>
+        <div class="header-meta">
+            <div class="header-meta-item"><strong>Week {{ week_number }}</strong> &nbsp;{{ week_date_range }}</div>
         </div>
-        
-        <div class="content">
-            <!-- Section 0: Weekly ETF Insights -->
-            {% if etf_insights %}
-            <div class="section">
-                <h2 class="section-title">🧠 Weekly ETF Insights</h2>
+    </div>
+
+    <div class="content">
+
+        <!-- ETF Insights -->
+        {% if etf_insights %}
+        <div class="section">
+            <div class="section-label">Market Intelligence</div>
+            <div class="section-title">ETF Industry Highlights</div>
+            <ul class="insights-list">
+                {% for item in etf_insights %}
+                <li>
+                    <span class="insight-point">{{ item.point }}</span>
+                    <span class="insight-source">
+                        <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>{% if item.source_date %} &mdash; {{ item.source_date }}{% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Watchlist -->
+        {% if stock_insights %}
+        <div class="section">
+            <div class="section-label">Watchlist</div>
+            <div class="section-title">Company Briefs</div>
+            {% for stock in stock_insights %}
+            <div class="watchlist-stock">
+                <div class="watchlist-ticker">{{ stock.ticker }}</div>
                 <ul class="insights-list">
-                    {% for item in etf_insights %}
+                    {% for item in stock.insights %}
                     <li>
-                        <span class="insights-point">• {{ item.point }}</span>
-                        <span class="insights-source">
-                            Source: <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>{% if item.source_date %} &mdash; {{ item.source_date }}{% endif %}
+                        <span class="insight-point">{{ item.point }}</span>
+                        <span class="insight-source">
+                            <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>{% if item.source_date %} &mdash; {{ item.source_date }}{% endif %}
                         </span>
                     </li>
                     {% endfor %}
                 </ul>
             </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Launches -->
+        <div class="section">
+            <div class="section-label">Product Activity</div>
+            <div class="section-title">New Launches</div>
+            {% if launches %}
+            <table class="launch-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Name</th>
+                        <th>Issuer</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for launch in launches %}
+                    <tr>
+                        <td class="ticker-cell">{{ launch.ticker }}</td>
+                        <td>{{ launch.name }}</td>
+                        <td class="issuer-cell">{{ launch.issuer }}</td>
+                        <td class="issuer-cell">{{ launch.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No new launches this week</div>
+            {% endif %}
+        </div>
+
+        <!-- Closures -->
+        <div class="section">
+            <div class="section-label">Product Activity</div>
+            <div class="section-title">Closures &amp; Delistings</div>
+            {% if closures %}
+            <table class="closure-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Name</th>
+                        <th>Issuer</th>
+                        <th>Date</th>
+                        <th style="text-align:right;">Last AUM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for closure in closures %}
+                    <tr>
+                        <td class="ticker-cell">{{ closure.ticker }}</td>
+                        <td>{{ closure.name }}</td>
+                        <td class="issuer-cell">{{ closure.issuer }}</td>
+                        <td class="issuer-cell">{{ closure.date }}</td>
+                        <td style="text-align:right;" class="num">
+                            {% if closure.last_aum %}${{ "{:,.0f}".format(closure.last_aum) }}{% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No closures this week</div>
+            {% endif %}
+        </div>
+
+        <!-- AUM Movers -->
+        <div class="section">
+            <div class="section-label">Fund Flows</div>
+            <div class="section-title">Top AUM Movers</div>
+            {% if top_gainers or top_losers %}
+
+            <div class="table-subheader gains">Top Gainers</div>
+            {% if top_gainers %}
+            {% if is_email_body %}
+            <table class="data-table">
+                <thead><tr><th>Ticker</th><th>Issuer</th><th style="text-align:right;">Prev</th><th style="text-align:right;">Current</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
+                <tbody>
+                    {% for m in top_gainers %}
+                    <tr>
+                        <td><span class="ticker-cell">{{ m.ticker }}</span><br><span style="font-size:11px;color:#6b7280;">{{ m.name }}</span></td>
+                        <td class="issuer-cell">{{ m.issuer }}</td>
+                        <td style="text-align:right;" class="num">{{ m.prev_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num">{{ m.current_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num positive">+{{ m.change | compact_aum }}</td>
+                        <td style="text-align:right;" class="num positive">+{{ "{:.2f}".format(m.change_pct * 100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <table class="data-table">
+                <thead><tr><th>Ticker</th><th>Name</th><th>Issuer</th><th style="text-align:right;">Prev AUM</th><th style="text-align:right;">AUM</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
+                <tbody>
+                    {% for m in top_gainers %}
+                    <tr>
+                        <td class="ticker-cell">{{ m.ticker }}</td>
+                        <td>{{ m.name }}</td>
+                        <td class="issuer-cell">{{ m.issuer }}</td>
+                        <td style="text-align:right;" class="num">{{ m.prev_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num">{{ m.current_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num positive">+{{ m.change | compact_aum }}</td>
+                        <td style="text-align:right;" class="num positive">+{{ "{:.2f}".format(m.change_pct * 100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
             {% endif %}
 
-            <!-- Section 0b: Stock Watchlist Insights -->
-            {% if stock_insights %}
-            <div class="section">
-                <h2 class="section-title">📌 Watchlist Stock Updates</h2>
-                {% for stock in stock_insights %}
-                <div style="margin-bottom: 24px;">
-                    <h3 style="color: #1e3a8a; font-size: 18px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb;">{{ stock.ticker }}</h3>
-                    <ul class="insights-list">
-                        {% for item in stock.insights %}
-                        <li>
-                            <span class="insights-point">• {{ item.point }}</span>
-                            <span class="insights-source">
-                                Source: <a href="{{ item.source_url }}" target="_blank">{{ item.source_title }}</a>{% if item.source_date %} &mdash; {{ item.source_date }}{% endif %}
-                            </span>
-                        </li>
-                        {% endfor %}
-                    </ul>
+            <div class="table-subheader losses">Top Losers</div>
+            {% if top_losers %}
+            {% if is_email_body %}
+            <table class="data-table">
+                <thead><tr><th>Ticker</th><th>Issuer</th><th style="text-align:right;">Prev</th><th style="text-align:right;">Current</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
+                <tbody>
+                    {% for m in top_losers %}
+                    <tr>
+                        <td><span class="ticker-cell">{{ m.ticker }}</span><br><span style="font-size:11px;color:#6b7280;">{{ m.name }}</span></td>
+                        <td class="issuer-cell">{{ m.issuer }}</td>
+                        <td style="text-align:right;" class="num">{{ m.prev_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num">{{ m.current_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num negative">{{ m.change | compact_aum }}</td>
+                        <td style="text-align:right;" class="num negative">{{ "{:.2f}".format(m.change_pct * 100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <table class="data-table">
+                <thead><tr><th>Ticker</th><th>Name</th><th>Issuer</th><th style="text-align:right;">Prev AUM</th><th style="text-align:right;">AUM</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
+                <tbody>
+                    {% for m in top_losers %}
+                    <tr>
+                        <td class="ticker-cell">{{ m.ticker }}</td>
+                        <td>{{ m.name }}</td>
+                        <td class="issuer-cell">{{ m.issuer }}</td>
+                        <td style="text-align:right;" class="num">{{ m.prev_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num">{{ m.current_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num negative">{{ m.change | compact_aum }}</td>
+                        <td style="text-align:right;" class="num negative">{{ "{:.2f}".format(m.change_pct * 100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% endif %}
+
+            {% else %}
+            <div class="empty-state">No AUM movement data available</div>
+            {% endif %}
+        </div>
+
+        <!-- Issuer Scoreboard -->
+        <div class="section">
+            <div class="section-label">Industry Overview</div>
+            <div class="section-title">Issuer Scoreboard</div>
+            {% if scoreboard %}
+            <table class="scoreboard-table">
+                <thead>
+                    <tr>
+                        <th>Issuer</th>
+                        <th style="text-align:right;">Funds</th>
+                        <th style="text-align:right;">Total AUM</th>
+                        <th style="text-align:right;">WoW Change</th>
+                        <th style="text-align:right;">%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issuer in scoreboard %}
+                    <tr>
+                        <td class="issuer-name">{{ issuer.name }}</td>
+                        <td style="text-align:right;" class="num">{{ issuer.fund_count }}</td>
+                        <td style="text-align:right;" class="num">{{ issuer.total_aum | compact_aum }}</td>
+                        <td style="text-align:right;" class="num {% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
+                            {% if issuer.aum_change > 0 %}+{% endif %}{{ issuer.aum_change | compact_aum }}
+                        </td>
+                        <td style="text-align:right;" class="num {% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
+                            {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">No scoreboard data available</div>
+            {% endif %}
+        </div>
+
+        <!-- Fund Count Changes -->
+        {% if fund_count_changes %}
+        <div class="section">
+            <div class="section-label">Industry Overview</div>
+            <div class="section-title">Fund Count Changes</div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Issuer</th>
+                        <th style="text-align:right;">Previous</th>
+                        <th style="text-align:right;">Current</th>
+                        <th style="text-align:right;">Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for change in fund_count_changes %}
+                    <tr>
+                        <td class="issuer-name">{{ change.issuer }}</td>
+                        <td style="text-align:right;" class="num">{{ change.prev_count }}</td>
+                        <td style="text-align:right;" class="num">{{ change.current_count }}</td>
+                        <td style="text-align:right;" class="num {% if change.change > 0 %}positive{% elif change.change < 0 %}negative{% else %}neutral{% endif %}">
+                            {% if change.change > 0 %}+{% endif %}{{ change.change }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Weekly Activity Log -->
+        <div class="section">
+            <div class="section-label">Activity Log</div>
+            <div class="section-title">Daily Summary</div>
+            {% if weekly_timeline %}
+            <div class="timeline">
+                {% for day in weekly_timeline %}
+                <div class="timeline-item">
+                    <div class="timeline-date">{{ day.date }}</div>
+                    <div class="timeline-content">
+                        {{ day.launches }} launch{% if day.launches != 1 %}es{% endif %},
+                        {{ day.closures }} closure{% if day.closures != 1 %}s{% endif %},
+                        {{ day.aum_changes }} AUM changes
+                    </div>
                 </div>
                 {% endfor %}
             </div>
-            {% endif %}
-
-            <!-- Section 1: New Launches -->
-            <div class="section">
-                <h2 class="section-title">🚀 New Launches</h2>
-                {% if launches %}
-                    {% for launch in launches %}
-                    <div class="card">
-                        <div class="card-title">{{ launch.ticker }}</div>
-                        <div class="card-meta"><strong>Name:</strong> {{ launch.name }}</div>
-                        <div class="card-meta"><strong>Issuer:</strong> {{ launch.issuer }}</div>
-                        <div class="card-meta"><strong>Launch Date:</strong> {{ launch.date }}</div>
-                        {% if launch.aum %}
-                        <div class="card-meta"><strong>Initial AUM:</strong> ${{ "{:,.0f}".format(launch.aum) }}</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">No new launches this week</div>
-                {% endif %}
-            </div>
-
-            <!-- Section 2: Closures & Delistings -->
-            <div class="section">
-                <h2 class="section-title">🔻 Closures & Delistings</h2>
-                {% if closures %}
-                    {% for closure in closures %}
-                    <div class="card">
-                        <div class="card-title">{{ closure.ticker }}</div>
-                        <div class="card-meta"><strong>Name:</strong> {{ closure.name }}</div>
-                        <div class="card-meta"><strong>Issuer:</strong> {{ closure.issuer }}</div>
-                        <div class="card-meta"><strong>Closure Date:</strong> {{ closure.date }}</div>
-                        {% if closure.last_aum %}
-                        <div class="card-meta"><strong>Last AUM:</strong> ${{ "{:,.0f}".format(closure.last_aum) }}</div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">No closures this week</div>
-                {% endif %}
-            </div>
-
-            <!-- Section 3: AUM Movers -->
-            <div class="section">
-                <h2 class="section-title">📈 Top AUM Movers</h2>
-                {% if top_gainers or top_losers %}
-                    <h3 style="color: #059669; margin-bottom: 12px;">Top 20 Gainers</h3>
-                    {% if top_gainers %}
-                        {% if is_email_body %}
-                        <table class="movers-table" style="margin-bottom: 30px;">
-                            <thead>
-                                <tr>
-                                    <th>Ticker</th>
-                                    <th>Issuer</th>
-                                    <th>AUM Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for mover in top_gainers %}
-                                <tr>
-                                    <td><strong>{{ mover.ticker }}</strong><br><span style="font-weight: 400; font-size: 11px; color: #666;">{{ mover.name }}</span></td>
-                                    <td>{{ mover.issuer }}</td>
-                                    <td>{{ mover.prev_aum | compact_aum }} → {{ mover.current_aum | compact_aum }} | <span class="positive">+{{ mover.change | compact_aum }} (+{{ "{:.2f}".format(mover.change_pct * 100) }}%)</span></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% else %}
-                        <table style="margin-bottom: 30px;">
-                            <thead>
-                                <tr>
-                                    <th>Ticker</th>
-                                    <th>Name</th>
-                                    <th>Issuer</th>
-                                    <th>Previous AUM</th>
-                                    <th>Current AUM</th>
-                                    <th>Change</th>
-                                    <th>% Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for mover in top_gainers %}
-                                <tr>
-                                    <td><strong>{{ mover.ticker }}</strong></td>
-                                    <td>{{ mover.name }}</td>
-                                    <td>{{ mover.issuer }}</td>
-                                    <td>{{ mover.prev_aum | compact_aum }}</td>
-                                    <td>{{ mover.current_aum | compact_aum }}</td>
-                                    <td class="positive" style="white-space: nowrap;">+{{ mover.change | compact_aum }}</td>
-                                    <td class="positive" style="white-space: nowrap;">+{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% endif %}
-                    {% endif %}
-
-                    <h3 style="color: #dc2626; margin-bottom: 12px;">Top 20 Losers</h3>
-                    {% if top_losers %}
-                        {% if is_email_body %}
-                        <table class="movers-table">
-                            <thead>
-                                <tr>
-                                    <th>Ticker</th>
-                                    <th>Issuer</th>
-                                    <th>AUM Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for mover in top_losers %}
-                                <tr>
-                                    <td><strong>{{ mover.ticker }}</strong><br><span style="font-weight: 400; font-size: 11px; color: #666;">{{ mover.name }}</span></td>
-                                    <td>{{ mover.issuer }}</td>
-                                    <td>{{ mover.prev_aum | compact_aum }} → {{ mover.current_aum | compact_aum }} | <span class="negative">{{ mover.change | compact_aum }} ({{ "{:.2f}".format(mover.change_pct * 100) }}%)</span></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% else %}
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Ticker</th>
-                                    <th>Name</th>
-                                    <th>Issuer</th>
-                                    <th>Previous AUM</th>
-                                    <th>Current AUM</th>
-                                    <th>Change</th>
-                                    <th>% Change</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for mover in top_losers %}
-                                <tr>
-                                    <td><strong>{{ mover.ticker }}</strong></td>
-                                    <td>{{ mover.name }}</td>
-                                    <td>{{ mover.issuer }}</td>
-                                    <td>{{ mover.prev_aum | compact_aum }}</td>
-                                    <td>{{ mover.current_aum | compact_aum }}</td>
-                                    <td class="negative" style="white-space: nowrap;">{{ mover.change | compact_aum }}</td>
-                                    <td class="negative" style="white-space: nowrap;">{{ "{:.2f}".format(mover.change_pct * 100) }}%</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% endif %}
-                    {% endif %}
-                {% else %}
-                    <div class="empty-state">No AUM movement data available</div>
-                {% endif %}
-            </div>
-            
-            <!-- Section 4: Issuer Scoreboard -->
-            <div class="section">
-                <h2 class="section-title">🏆 Issuer Scoreboard</h2>
-                {% if scoreboard %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Issuer</th>
-                                <th>Total Funds</th>
-                                <th>Total AUM</th>
-                                <th>WoW Change</th>
-                                <th>% Change</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for issuer in scoreboard %}
-                            <tr>
-                                <td><strong>{{ issuer.name }}</strong></td>
-                                <td>{{ issuer.fund_count }}</td>
-                                <td>{{ issuer.total_aum | compact_aum }}</td>
-                                <td class="{% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
-                                    {% if issuer.aum_change > 0 %}+{% endif %}{{ issuer.aum_change | compact_aum }}
-                                </td>
-                                <td class="{% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
-                                    {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <div class="empty-state">No scoreboard data available</div>
-                {% endif %}
-            </div>
-
-            <!-- Section 5: Fund Count Changes -->
-            <div class="section">
-                <h2 class="section-title">📊 Fund Count Changes</h2>
-                {% if fund_count_changes %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Issuer</th>
-                                <th>Previous Count</th>
-                                <th>Current Count</th>
-                                <th>Change</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for change in fund_count_changes %}
-                            <tr>
-                                <td><strong>{{ change.issuer }}</strong></td>
-                                <td>{{ change.prev_count }}</td>
-                                <td>{{ change.current_count }}</td>
-                                <td class="{% if change.change > 0 %}positive{% elif change.change < 0 %}negative{% else %}neutral{% endif %}">
-                                    {% if change.change > 0 %}+{% endif %}{{ change.change }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <div class="empty-state">No fund count changes this week</div>
-                {% endif %}
-            </div>
-
-            <!-- Section 6: Weekly Activity Log -->
-            <div class="section">
-                <h2 class="section-title">📅 Weekly Activity Log</h2>
-                {% if weekly_timeline %}
-                    <div class="timeline">
-                        {% for day in weekly_timeline %}
-                        <div class="timeline-item">
-                            <div class="timeline-date">{{ day.date }}</div>
-                            <div class="timeline-content">
-                                {{ day.launches }} launches, {{ day.closures }} closures, {{ day.aum_changes }} AUM changes
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="empty-state">No activity recorded this week</div>
-                {% endif %}
-            </div>
-
-            <!-- Section 7: Full Fund List (hidden in email body) -->
-            {% if not is_email_body %}
-            <div class="section">
-                <h2 class="section-title">📋 Full Fund List</h2>
-                {% if fund_list %}
-                    {% for issuer_group in fund_list %}
-                    <div class="issuer-group">
-                        <div class="issuer-header">
-                            {{ issuer_group.name }} ({{ issuer_group.fund_count }} funds)
-                        </div>
-                        <div class="fund-list">
-                            {% for fund in issuer_group.funds %}
-                            <div class="fund-item">
-                                <span class="fund-ticker">{{ fund.ticker }}</span>
-                                <span class="fund-name">{{ fund.name }}</span>
-                                <span class="fund-aum">
-                                    {% if fund.aum %}
-                                        ${{ "{:,.0f}".format(fund.aum) }}
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </span>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">No fund data available</div>
-                {% endif %}
-            </div>
+            {% else %}
+            <div class="empty-state">No activity recorded this week</div>
             {% endif %}
         </div>
-        
-        <div class="footer">
-            <p>Generated by ETF Ticker Scraper | {{ generation_time }}</p>
+
+        <!-- Full Fund List -->
+        {% if not is_email_body %}
+        <div class="section">
+            <div class="section-label">Reference</div>
+            <div class="section-title">Full Fund List</div>
+            {% if fund_list %}
+                {% for issuer_group in fund_list %}
+                <div class="issuer-group">
+                    <div class="issuer-group-header">
+                        <span>{{ issuer_group.name }}</span>
+                        <span class="fund-count">{{ issuer_group.fund_count }} funds</span>
+                    </div>
+                    {% for fund in issuer_group.funds %}
+                    <div class="fund-item">
+                        <span class="fund-ticker">{{ fund.ticker }}</span>
+                        <span class="fund-name">{{ fund.name }}</span>
+                        <span class="fund-aum">
+                            {% if fund.aum %}${{ "{:,.0f}".format(fund.aum) }}{% else %}N/A{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">No fund data available</div>
+            {% endif %}
         </div>
+        {% endif %}
+
     </div>
+
+    <div class="footer">
+        <span>ETF Ticker Scraper</span>
+        <span>Generated {{ generation_time }}</span>
+    </div>
+
+</div>
 </body>
 </html>
