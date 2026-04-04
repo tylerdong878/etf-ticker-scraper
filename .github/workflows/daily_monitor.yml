@@ -4,9 +4,11 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
-  # Run at 10:00 UTC (6 AM ET) on weekdays
+  # Scrape Mon–Fri at 21:00 UTC (5 PM ET, end of day)
+  # Report Mon at 09:00 UTC (5 AM ET, lands in inbox before workday)
   schedule:
-    - cron: '0 10 * * 1-5'
+    - cron: '0 21 * * 1-5'
+    - cron: '0 9 * * 1'
   
   # Allow manual trigger with mode selection
   workflow_dispatch:
@@ -52,10 +54,11 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             MODE="${{ inputs.mode }}"
           else
-            # Check if today is Monday (1 = Monday in date command)
-            DAY=$(date +%u)
-            if [ "$DAY" = "1" ]; then
-              MODE="both"
+            HOUR=$(date +%H)
+            # 09:00 UTC Monday = report only
+            # 21:00 UTC Mon–Fri = scrape only
+            if [ "$HOUR" = "09" ]; then
+              MODE="report"
             else
               MODE="scrape"
             fi
