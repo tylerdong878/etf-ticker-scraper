@@ -34,13 +34,16 @@ STOCKANALYSIS_ISSUERS = {
     "ark": "https://stockanalysis.com/etf/provider/ark/",
 }
 
-# Issuers scraped from their own websites (4 issuers)
+# Issuers scraped from their own websites (7 issuers)
 DIRECT_ISSUERS = {
     "kurv": "https://www.kurvinvest.com/etfs",
     "volatility-shares": "https://www.volatilityshares.com/etf-product-list.php",
     "rex-shares": "https://www.rexshares.com/home/all-funds/",
     "leverage-shares": "https://leverageshares.com/us/all-etfs/",
     "bmo-max": "https://www.maxetns.com/",
+    "amplify": "https://amplifyetfs.com",
+    "vistashares": "https://www.vistashares.com",
+    "tappalpha": "https://tappalphafunds.com",
 }
 
 # New launches page on stockanalysis.com

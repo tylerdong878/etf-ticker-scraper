@@ -586,6 +586,291 @@ class BmoMaxScraper:
             return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
 
 
+class AmplifyScraper:
+    """Scraper for Amplify ETFs from https://amplifyetfs.com using plain requests."""
+
+    def __init__(self):
+        self.url = DIRECT_ISSUERS["amplify"]
+        self.issuer_slug = "amplify"
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def scrape(self) -> IssuerSnapshot:
+        """
+        Scrape Amplify ETFs.
+
+        Fund list structure (Elementor WordPress):
+          <li class="elementor-icon-list-item">
+            <a href="/divo">
+              <span class="elementor-icon-list-text"><b>DIVO</b> - Enhanced Dividend Income ETF</span>
+            </a>
+          </li>
+
+        No AUM data is available on the listing page (loads via JS from CSV feeds).
+        """
+        import requests
+
+        logger.info(f"Scraping {self.issuer_slug}: {self.url}")
+
+        try:
+            resp = requests.get(self.url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp.raise_for_status()
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+
+            funds = []
+            seen = set()
+
+            for li in soup.find_all("li", class_="elementor-icon-list-item"):
+                try:
+                    span = li.find("span", class_="elementor-icon-list-text")
+                    if not span:
+                        continue
+
+                    b_tag = span.find("b")
+                    if not b_tag:
+                        continue
+
+                    ticker = b_tag.get_text(strip=True).upper()
+                    # Valid tickers are 1-5 uppercase letters only — skip nav items
+                    if not ticker or ticker in seen or not ticker.isalpha() or len(ticker) > 5:
+                        continue
+
+                    # Full text is "<b>TICKER</b> - Fund Name"
+                    full_text = span.get_text(separator=" ", strip=True)
+                    # Strip "TICKER - " prefix to get name
+                    parts = full_text.split(" - ", 1)
+                    name = parts[1].strip() if len(parts) == 2 else full_text
+
+                    seen.add(ticker)
+                    funds.append(ETFund(
+                        ticker=ticker,
+                        name=name,
+                        issuer=self.issuer_slug,
+                        aum=None,
+                    ))
+
+                except Exception as e:
+                    logger.warning(f"Error parsing {self.issuer_slug} row: {e}")
+                    continue
+
+            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds (no AUM data)")
+            return IssuerSnapshot(
+                issuer_slug=self.issuer_slug,
+                total_funds=len(funds),
+                total_aum=0,
+                funds=funds,
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to scrape {self.issuer_slug}: {e}")
+            return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
+
+
+class VistaSharesScraper:
+    """Scraper for VistaShares ETFs from https://www.vistashares.com using plain requests."""
+
+    def __init__(self):
+        self.url = DIRECT_ISSUERS["vistashares"]
+        self.issuer_slug = "vistashares"
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def _parse_aum(self, aum_str: str) -> Optional[int]:
+        """Parse AUM string like '$1,810,947.05' to integer."""
+        try:
+            clean = aum_str.replace("$", "").replace(",", "").strip()
+            return int(float(clean))
+        except (ValueError, AttributeError):
+            return None
+
+    def scrape(self) -> IssuerSnapshot:
+        """
+        Scrape VistaShares ETFs.
+
+        Tickers are discovered from the nav menu:
+          <li class="menu-item sub-sub-menu-item ...">
+            <a href="/etf/ais"><strong>AIS</strong>: Artificial Intelligence Supercycle® ETF</a>
+          </li>
+
+        AUM is fetched from each fund's detail page:
+          <div><strong>Net Assets</strong><span>$1,810,947.05</span></div>
+        """
+        import requests
+
+        logger.info(f"Scraping {self.issuer_slug}: {self.url}")
+
+        try:
+            resp = requests.get(self.url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp.raise_for_status()
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+
+            # Discover tickers + names from nav menu
+            fund_stubs = []
+            seen = set()
+            for li in soup.find_all("li", class_="sub-sub-menu-item"):
+                a = li.find("a")
+                if not a:
+                    continue
+                strong = a.find("strong")
+                if not strong:
+                    continue
+
+                ticker = strong.get_text(strip=True).rstrip(":").upper()
+                if not ticker or ticker in seen:
+                    continue
+
+                href = a.get("href", "")
+                # Normalize to absolute URL
+                if href.startswith("/"):
+                    href = "https://www.vistashares.com" + href
+                elif not href.startswith("http"):
+                    continue
+
+                # Name follows the ticker: "TICKER: Fund Name"
+                # Replace <sup> tags with spaced text before extracting (e.g. <sup>TM</sup> → " TM ")
+                # Then normalize whitespace via split/join (handles nested spans like S<span>I</span>OO)
+                for sup in a.find_all("sup"):
+                    sup.replace_with(f" {sup.get_text()} ")
+                full_text = " ".join(a.get_text().split())
+                colon_idx = full_text.find(":")
+                name = full_text[colon_idx + 1:].strip() if colon_idx >= 0 else full_text
+                name = name.replace(" TM ", "™ ").replace(" TM", "™")
+
+                seen.add(ticker)
+                fund_stubs.append({"ticker": ticker, "name": name, "url": href})
+
+            # Fetch AUM from each fund's detail page
+            funds = []
+            for stub in fund_stubs:
+                aum = None
+                try:
+                    detail_resp = requests.get(
+                        stub["url"],
+                        headers={"User-Agent": "Mozilla/5.0"},
+                        timeout=30,
+                    )
+                    detail_resp.raise_for_status()
+                    detail_soup = BeautifulSoup(detail_resp.text, "html.parser")
+
+                    # Structure: <tr><td>Net Assets</td><td>$1,810,947.05</td></tr>
+                    for td in detail_soup.find_all("td"):
+                        if td.get_text(strip=True) == "Net Assets":
+                            next_td = td.find_next_sibling("td")
+                            if next_td:
+                                aum = self._parse_aum(next_td.get_text(strip=True))
+                            break
+
+                except Exception as e:
+                    logger.warning(f"Could not fetch AUM for {stub['ticker']}: {e}")
+
+                funds.append(ETFund(
+                    ticker=stub["ticker"],
+                    name=stub["name"],
+                    issuer=self.issuer_slug,
+                    aum=aum,
+                ))
+
+            total_aum = sum(f.aum for f in funds if f.aum)
+            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds, ${total_aum:,.0f} AUM")
+            return IssuerSnapshot(
+                issuer_slug=self.issuer_slug,
+                total_funds=len(funds),
+                total_aum=total_aum,
+                funds=funds,
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to scrape {self.issuer_slug}: {e}")
+            return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
+
+
+class TappAlphaScraper:
+    """Scraper for TappAlpha ETFs from https://tappalphafunds.com using plain requests."""
+
+    def __init__(self):
+        self.url = DIRECT_ISSUERS["tappalpha"]
+        self.issuer_slug = "tappalpha"
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def scrape(self) -> IssuerSnapshot:
+        """
+        Scrape TappAlpha ETFs.
+
+        Fund cards in the nav use class "navbar5_dropdown-link":
+          <a class="navbar5_dropdown-link w-inline-block" href="/etfs/tspy">
+            <div class="navbar5_item-right">
+              <div class="text-weight-semibold">TSPY</div>
+              <p class="text-size-small ...">TappAlpha SPY Growth & Daily Income ETF</p>
+            </div>
+          </a>
+
+        No AUM data is available on the listing page.
+        """
+        import requests
+
+        logger.info(f"Scraping {self.issuer_slug}: {self.url}")
+
+        try:
+            resp = requests.get(self.url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp.raise_for_status()
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+
+            funds = []
+            seen: set[str] = set()
+
+            for a in soup.find_all("a", class_="navbar5_dropdown-link"):
+                try:
+                    ticker_div = a.find("div", class_="text-weight-semibold")
+                    name_p = a.find("p", class_="text-size-small")
+
+                    if not ticker_div:
+                        continue
+
+                    ticker = ticker_div.get_text(strip=True).upper()
+                    if not ticker or ticker in seen:
+                        continue
+
+                    name = name_p.get_text(strip=True) if name_p else ticker
+                    seen.add(ticker)
+                    funds.append(ETFund(
+                        ticker=ticker,
+                        name=name,
+                        issuer=self.issuer_slug,
+                        aum=None,
+                    ))
+                except Exception as e:
+                    logger.warning(f"Error parsing {self.issuer_slug} card: {e}")
+                    continue
+
+            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds (no AUM data)")
+            return IssuerSnapshot(
+                issuer_slug=self.issuer_slug,
+                total_funds=len(funds),
+                total_aum=0,
+                funds=funds,
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to scrape {self.issuer_slug}: {e}")
+            return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
+
+
 def scrape_all_direct() -> dict[str, IssuerSnapshot]:
     """
     Scrape all direct issuer websites using their individual scrapers.
@@ -599,7 +884,10 @@ def scrape_all_direct() -> dict[str, IssuerSnapshot]:
         VolatilitySharesScraper(),
         RexSharesScraper(),
         LeverageSharesScraper(),
-        BmoMaxScraper()
+        BmoMaxScraper(),
+        AmplifyScraper(),
+        VistaSharesScraper(),
+        TappAlphaScraper(),
     ]
     
     logger.info(f"Starting scrape of {len(scrapers)} direct issuers")
