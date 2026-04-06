@@ -3,6 +3,7 @@ Fetches weekly ETF industry insights and stock-specific updates using the Gemini
 with Google Search grounding.
 """
 import json
+import time
 from datetime import datetime, timedelta
 
 from ..utils.config import GEMINI_API_KEY
@@ -274,7 +275,7 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
     return results
 
 
-def get_all_stock_insights(tickers: list[str], batch_size: int = 4) -> list[dict]:
+def get_all_stock_insights(tickers: list[str], batch_size: int = 3) -> list[dict]:
     """
     Returns a list of {ticker, insights} dicts for each ticker in the watchlist.
     Tickers are processed in batches of batch_size (default 5) to balance
@@ -290,11 +291,21 @@ def get_all_stock_insights(tickers: list[str], batch_size: int = 4) -> list[dict
     results = []
 
     for i, chunk in enumerate(chunks):
-        try:
-            batch_results = _fetch_batch_insights(chunk, client, config, date_context)
-            results.extend(batch_results)
-            logger.info(f"Batch {i + 1}/{len(chunks)}: got insights for {len(batch_results)}/{len(chunk)} tickers")
-        except Exception as e:
-            logger.warning(f"Batch {i + 1}/{len(chunks)} failed ({chunk}): {e}")
+        if i > 0:
+            time.sleep(13)
+        tickers_str = ", ".join(chunk)
+        logger.info(f"Batch {i + 1}/{len(chunks)}: fetching insights for {tickers_str}...")
+        for attempt in range(2):
+            try:
+                batch_results = _fetch_batch_insights(chunk, client, config, date_context)
+                results.extend(batch_results)
+                logger.info(f"Batch {i + 1}/{len(chunks)}: success — got insights for {len(batch_results)}/{len(chunk)} tickers")
+                break
+            except Exception as e:
+                if attempt == 0:
+                    logger.warning(f"Batch {i + 1}/{len(chunks)}: failed for {tickers_str}, retrying... ({e})")
+                    time.sleep(13)
+                else:
+                    logger.warning(f"Batch {i + 1}/{len(chunks)}: failed after retry for {tickers_str} ({e})")
 
     return results
