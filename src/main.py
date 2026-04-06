@@ -312,7 +312,11 @@ def report_mode(dry_run: bool = False) -> None:
 
         # Step 7: Send email if enabled and not dry-run
         if SEND_EMAIL and not dry_run and not DRY_RUN:
-            subject = f"ETF Ticker Scraper Report - {current_snapshot.date}"
+            snap_date = datetime.strptime(current_snapshot.date, "%Y-%m-%d")
+            week_start = snap_date - timedelta(days=snap_date.weekday())
+            week_end = week_start + timedelta(days=4)
+            week_range = f"{week_start.strftime('%b %-d')} – {week_end.strftime('%b %-d')}"
+            subject = f"Weekly ETF Report - Week of {week_range}"
             if report_type == "daily":
                 subject = f"Daily ETF Update - {current_snapshot.date}"
 
