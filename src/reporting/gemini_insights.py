@@ -210,7 +210,9 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
         f"No markdown. No code fences. No ```json. No explanation. No preamble. No trailing text. "
         f"The very first character must be '{{' and the very last must be '}}'. "
         f"The object must have one key per ticker symbol (uppercase). "
-        f"Each value must be a JSON array of news objects.\n\n"
+        f"Each value must be a JSON array of news objects. "
+        f"IMPORTANT: Do NOT truncate the response. Ensure the JSON is complete and valid before finishing — "
+        f"every opened bracket must be closed, every string must be properly terminated, and the final character must be '}}'.\n\n"
         f"Each news object must have EXACTLY these 4 keys "
         f"(lowercase, underscores, no variations):\n"
         f'  "point"        — string — one concise sentence summarizing the news\n'

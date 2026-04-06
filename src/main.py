@@ -313,7 +313,9 @@ def report_mode(dry_run: bool = False) -> None:
         # Step 7: Send email if enabled and not dry-run
         if SEND_EMAIL and not dry_run and not DRY_RUN:
             snap_date = datetime.strptime(current_snapshot.date, "%Y-%m-%d")
-            week_start = snap_date - timedelta(days=snap_date.weekday())
+            # If snapshot is Monday, report covers the previous week
+            ref_date = snap_date - timedelta(days=7) if snap_date.weekday() == 0 else snap_date
+            week_start = ref_date - timedelta(days=ref_date.weekday())
             week_end = week_start + timedelta(days=4)
             week_range = f"{week_start.strftime('%b %-d')} – {week_end.strftime('%b %-d')}"
             subject = f"Weekly ETF Report - Week of {week_range}"
