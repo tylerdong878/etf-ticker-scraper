@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Issuer configuration - organized by scraping method
 
-# Issuers available on stockanalysis.com (11 issuers)
+# Issuers available on stockanalysis.com (17 issuers)
 STOCKANALYSIS_ISSUERS = {
     "proshares": "https://stockanalysis.com/etf/provider/proshares/",
     "direxion": "https://stockanalysis.com/etf/provider/direxion/",
@@ -32,6 +32,7 @@ STOCKANALYSIS_ISSUERS = {
     "bitwise": "https://stockanalysis.com/etf/provider/bitwise/",
     "grayscale": "https://stockanalysis.com/etf/provider/grayscale/",
     "ark": "https://stockanalysis.com/etf/provider/ark/",
+    "aptus-capital-advisors": "https://stockanalysis.com/etf/provider/aptus-capital-advisors/",
 }
 
 # Issuers scraped from their own websites (7 issuers)
