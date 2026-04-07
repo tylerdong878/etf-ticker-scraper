@@ -260,33 +260,34 @@ def report_mode(dry_run: bool = False) -> None:
         
         logger.info(f"Generating {report_type} report...")
         
-        # Step 1: Load today's snapshot (or latest)
-        current_snapshot = load_latest_snapshot()
+        # Step 1: Load last Friday's snapshot as current (clean EOD weekly reference)
+        today = datetime.now()
+        days_since_friday = (today.weekday() - 4) % 7 or 7  # always go back to last Friday
+        last_friday = (today - timedelta(days=days_since_friday)).strftime("%Y-%m-%d")
+        prev_friday = (today - timedelta(days=days_since_friday + 7)).strftime("%Y-%m-%d")
+
+        current_snapshot = load_snapshot(last_friday)
+        if not current_snapshot:
+            logger.info(f"No snapshot for last Friday ({last_friday}), falling back to latest")
+            current_snapshot = load_latest_snapshot()
         if not current_snapshot:
             logger.error("No snapshot found to generate report")
             return
-        
+
         logger.info(f"Loaded snapshot for {current_snapshot.date}")
-        
-        # Step 2: Load snapshot from 7 days ago
-        current_date = datetime.strptime(current_snapshot.date, "%Y-%m-%d")
-        week_ago_date = (current_date - timedelta(days=7)).strftime("%Y-%m-%d")
-        
-        previous_snapshot = load_snapshot(week_ago_date)
+
+        # Step 2: Load previous Friday's snapshot for comparison
+        previous_snapshot = load_snapshot(prev_friday)
         if not previous_snapshot:
-            # Try to find nearest available snapshot
-            logger.info(f"No snapshot found for {week_ago_date}, looking for nearest...")
+            logger.info(f"No snapshot for previous Friday ({prev_friday}), looking for nearest...")
             previous_date = get_previous_date(current_snapshot.date)
             if previous_date:
                 previous_snapshot = load_snapshot(previous_date)
                 logger.info(f"Using snapshot from {previous_date} for comparison")
         
-        # Step 3: Load changelog — use previous week's if today is Monday (first day of ISO week),
-        # since all changes happened last week and this week's changelog only has today's entry.
-        iso_year, iso_week, iso_weekday = current_date.isocalendar()
-        if iso_weekday == 1:  # Monday
-            prev_week_date = current_date - timedelta(days=7)
-            iso_year, iso_week, _ = prev_week_date.isocalendar()
+        # Step 3: Load changelog for the week of the current snapshot (last Friday's week)
+        snap_date = datetime.strptime(current_snapshot.date, "%Y-%m-%d")
+        iso_year, iso_week, _ = snap_date.isocalendar()
         week_str = f"{iso_year}-W{iso_week:02d}"
         changelog = load_weekly_changelog(week_str)
         
