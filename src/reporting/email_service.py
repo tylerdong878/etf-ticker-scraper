@@ -123,9 +123,11 @@ def generate_report(
     
     # Parse date and get week number with date range
     date_obj = datetime.strptime(current_snapshot.date, "%Y-%m-%d")
-    week_number = date_obj.isocalendar()[1]
-    week_start = date_obj - timedelta(days=date_obj.weekday())  # Monday
-    week_end = week_start + timedelta(days=6)  # Sunday
+    # If snapshot is Monday, report covers the previous week
+    ref_date = date_obj - timedelta(days=7) if date_obj.weekday() == 0 else date_obj
+    week_number = ref_date.isocalendar()[1]
+    week_start = ref_date - timedelta(days=ref_date.weekday())  # Monday
+    week_end = week_start + timedelta(days=4)  # Friday
     if week_start.month == week_end.month:
         week_date_range = f"{week_start.strftime('%b %d')}–{week_end.strftime('%d')}"
     else:

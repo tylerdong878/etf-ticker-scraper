@@ -94,7 +94,11 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update ETF data - $(date +'%Y-%m-%d')"
+            if [ "${{ steps.mode.outputs.mode }}" = "report" ]; then
+              git commit -m "Add weekly ETF report - $(date +'%Y-%m-%d')"
+            else
+              git commit -m "Update ETF data - $(date +'%Y-%m-%d')"
+            fi
             git push
           fi
       
