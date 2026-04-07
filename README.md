@@ -1,18 +1,19 @@
 # ETF Ticker Scraper
 
-Automated system for tracking ETF launches, closures, and market changes across 16 major issuers. Generates weekly reports with executive summaries, Gemini-powered market insights, and detailed PDF attachments.
+Automated system for tracking ETF launches, closures, and market changes across 25 issuers. Generates weekly reports with executive summaries, Gemini-powered market insights, and detailed PDF attachments.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- **Multi-Source Scraping**: Collects data from 16 ETF issuers (11 via StockAnalysis.com, 5 direct websites)
+- **Multi-Source Scraping**: Collects data from 25 ETF issuers (17 via StockAnalysis.com, 8 direct websites)
 - **Change Detection**: Automatically identifies launches, closures, and AUM changes
-- **Market Enrichment**: Enhances data with yfinance (NAV, volume, inception dates)
+- **Market Enrichment**: Enhances data with yfinance (NAV, volume, expense ratios, inception dates)
+- **Fee Analytics**: AUM-weighted average expense ratio and estimated annual revenue per issuer
 - **Gemini Insights**: Weekly ETF industry news and watchlist stock updates via Gemini API with Google Search grounding
-- **Smart Reporting**: Generates HTML reports with PDF attachments
-- **GitHub Actions**: Automated daily scraping and weekly reports
+- **Smart Reporting**: Generates HTML reports with PDF attachments, stored in git for historical tracking
+- **GitHub Actions**: EOD scraping on weekdays, Monday morning weekly reports
 
 ## Project Structure
 
@@ -124,17 +125,22 @@ pytest --cov=src
 
 ## Data Sources
 
-### StockAnalysis.com (11 Issuers)
+### StockAnalysis.com (17 Issuers)
 - ProShares, Direxion, GraniteShares, YieldMax, NEOS
 - Roundhill, REX Microsectors, Tuttle Capital Management
 - Defiance, Simplify, TRADR
+- Global X, KraneShares, Bitwise, Grayscale, ARK
+- Aptus Capital Advisors
 
-### Direct Websites (5 Issuers)
+### Direct Websites (8 Issuers)
 - **Kurv**: https://www.kurvinvest.com/etfs
 - **Volatility Shares**: https://www.volatilityshares.com/etf-product-list.php
 - **REX Shares**: https://www.rexshares.com/home/all-funds/
 - **Leverage Shares**: https://leverageshares.com/us/all-etfs/
 - **BMO MAX**: https://www.maxetns.com/
+- **Amplify**: direct website
+- **VistaShares**: direct website
+- **TappAlpha**: direct website
 
 ### New Launches
 - Monitors StockAnalysis.com's new ETF list for launches from tracked issuers
@@ -142,31 +148,37 @@ pytest --cov=src
 ## Report Structure
 
 ### Email Body (Executive Summary)
-1. Weekly Activity Log (timeline)
-2. New Launches (detail cards)
-3. Closures & Delistings
-4. Issuer Scoreboard (WoW changes)
-5. Top AUM Movers (gainers/losers)
+1. New Launches (detail cards)
+2. Closures & Delistings
+3. Weekly Activity Log (timeline)
+4. Issuer Scoreboard (WoW changes, AUM-weighted avg fee, estimated annual revenue)
+5. Top AUM Movers (gainers/losers — top 20)
 6. Fund Count Changes
 7. ETF Industry Insights (Gemini-powered, sourced from the past week)
 8. Watchlist Stock Insights (per-ticker news for configured tickers)
 
 ### PDF Attachment (Full Report)
 - All sections above PLUS
-- Complete fund list grouped by issuer
+- Complete fund list grouped by issuer with expense ratio and estimated annual revenue columns
+
+### Report Storage
+- HTML and PDF reports are committed to `data/reports/` in git for historical tracking
+- Filename format: `report_YYYY-MM-DD.html` / `report_YYYY-MM-DD.pdf`
+- Weekly reports compare Friday EOD snapshots for clean week-over-week data
 
 ## Automation
 
 GitHub Actions runs automatically:
-- **Schedule**: Weekdays at 10:00 UTC (6 AM ET)
-- **Monday**: Full scrape + report
-- **Tuesday-Friday**: Scrape only
-- **Manual**: Trigger with custom mode
+- **Weekdays at 21:00 UTC (5 PM ET)**: EOD scrape — captures final market data after close
+- **Mondays at 09:00 UTC (5 AM ET)**: Generate and send weekly report comparing Friday EOD snapshots
+- **Manual**: Trigger via `workflow_dispatch` with custom mode (scrape/report/both)
 
 ### Required Secrets
 - `GMAIL_USER`
 - `GMAIL_APP_PASSWORD`
 - `RECIPIENT_EMAIL`
+- `GEMINI_API_KEY` (optional — insights skipped if not set)
+- `WATCHLIST_TICKERS` (optional — comma-separated tickers for stock insights)
 
 ## Testing
 
@@ -199,7 +211,7 @@ data/
 
 The system follows a modular pipeline:
 
-1. **Scraping**: Collect data from 15 sources
+1. **Scraping**: Collect data from 25 sources
 2. **Detection**: Compare snapshots, identify changes
 3. **Enrichment**: Add market data via yfinance
 4. **Reporting**: Generate HTML/PDF reports
