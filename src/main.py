@@ -13,7 +13,7 @@ from .scrapers.new_launches_scraper import NewLaunchesScraper
 from .detection.snapshot_manager import (
     save_snapshot, load_snapshot, load_latest_snapshot, get_previous_date
 )
-from .detection.change_detector import detect_changes, append_to_changelog, load_weekly_changelog
+from .detection.change_detector import detect_changes, append_to_changelog, load_weekly_changelog, filter_confirmed_closures
 from .enrichment.yahoo_finance import enrich_funds
 from .reporting.email_service import generate_report, send_email, save_report_locally, generate_pdf
 from .reporting.gemini_insights import get_etf_insights, get_all_stock_insights
@@ -81,6 +81,37 @@ def deduplicate_rex_tuttle(results: dict[str, IssuerSnapshot]) -> dict[str, Issu
         tuttle.total_funds = len(tuttle.funds)
         tuttle.total_aum = sum(f.aum for f in tuttle.funds if f.aum)
         logger.info(f"Deduplicated {removed} tickers from tuttle-capital-management (already in rex)")
+
+    return results
+
+
+def validate_and_carry_forward(
+    results: dict[str, IssuerSnapshot],
+    previous_snapshot: Optional[DailySnapshot]
+) -> dict[str, IssuerSnapshot]:
+    """
+    For each issuer that returned 0 funds, check whether the previous snapshot
+    had >0 funds. If so, carry forward the previous data to prevent scraper
+    failures from creating phantom closures.
+    """
+    if not previous_snapshot:
+        return results
+
+    carried_forward = []
+
+    for issuer_slug, current_issuer in results.items():
+        if current_issuer.total_funds == 0 and len(current_issuer.funds) == 0:
+            prev_issuer = previous_snapshot.issuers.get(issuer_slug)
+            if prev_issuer and prev_issuer.total_funds > 0:
+                logger.warning(
+                    f"CARRY-FORWARD: {issuer_slug} returned 0 funds but previously had "
+                    f"{prev_issuer.total_funds}. Using previous snapshot data."
+                )
+                results[issuer_slug] = prev_issuer
+                carried_forward.append(issuer_slug)
+
+    if carried_forward:
+        logger.warning(f"Carried forward data for {len(carried_forward)} issuers: {carried_forward}")
 
     return results
 
@@ -172,31 +203,34 @@ def scrape_mode(specific_issuer: Optional[str] = None) -> None:
             except Exception as e:
                 logger.error(f"Failed to enrich with yfinance: {e}")
         
-        # Step 6: Build DailySnapshot
+        # Step 6: Load previous snapshot (used for validation and change detection)
         today = date.today().isoformat()
+        previous_date = get_previous_date(today)
+        previous_snapshot = load_snapshot(previous_date) if previous_date else None
+
+        # Step 6.5: Validate results — carry forward on scraper failure
+        results = validate_and_carry_forward(results, previous_snapshot)
+
+        # Step 7: Build DailySnapshot
         snapshot = DailySnapshot(date=today, issuers=results)
-        
-        # Step 7: Save snapshot
+
+        # Step 8: Save snapshot
         save_snapshot(snapshot)
-        
-        # Step 8: Detect changes
+
+        # Step 9: Detect changes
         logger.info("Detecting changes from previous snapshot...")
         try:
-            previous_date = get_previous_date(today)
-            if previous_date:
-                previous_snapshot = load_snapshot(previous_date)
-                if previous_snapshot:
-                    changes = detect_changes(snapshot, previous_snapshot)
-                    total_launches = len(changes.get("launches", []))
-                    total_closures = len(changes.get("closures", []))
-                    
-                    # Append to changelog
-                    append_to_changelog(changes, today)
-                    logger.info(f"Changes detected: {total_launches} launches, {total_closures} closures")
-                else:
-                    logger.info("No previous snapshot found for comparison")
+            if previous_snapshot:
+                changes = detect_changes(snapshot, previous_snapshot)
+                changes["closures"] = filter_confirmed_closures(changes["closures"])
+                total_launches = len(changes.get("launches", []))
+                total_closures = len(changes.get("closures", []))
+
+                # Append to changelog
+                append_to_changelog(changes, today)
+                logger.info(f"Changes detected: {total_launches} launches, {total_closures} closures")
             else:
-                logger.info("This is the first snapshot")
+                logger.info("No previous snapshot found for comparison")
         except Exception as e:
             logger.error(f"Failed to detect changes: {e}")
         
@@ -212,10 +246,13 @@ def scrape_mode(specific_issuer: Optional[str] = None) -> None:
         
     except Exception as e:
         logger.error(f"Scrape mode failed: {e}", exc_info=True)
-        # Save whatever we collected
+        # Save whatever we collected (with carry-forward validation)
         if results:
-            today = date.today().isoformat()
-            snapshot = DailySnapshot(date=today, issuers=results)
+            today_str = date.today().isoformat()
+            prev_date = get_previous_date(today_str)
+            prev_snap = load_snapshot(prev_date) if prev_date else None
+            results = validate_and_carry_forward(results, prev_snap)
+            snapshot = DailySnapshot(date=today_str, issuers=results)
             save_snapshot(snapshot)
             logger.info("Saved partial snapshot despite errors")
         raise

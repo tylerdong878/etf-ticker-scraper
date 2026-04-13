@@ -49,20 +49,21 @@ def _merge_rex_issuers(scoreboard: list[dict]) -> list[dict]:
     
     # If both REX issuers exist, merge them
     if rex_micro and rex_shares:
+        micro_change = rex_micro['aum_change']
+        shares_change = rex_shares['aum_change']
+        if micro_change is not None and shares_change is not None:
+            merged_change = micro_change + shares_change
+            prev_aum = rex_micro['total_aum'] + rex_shares['total_aum'] - merged_change
+            merged_pct = merged_change / prev_aum if prev_aum != 0 else 0
+        else:
+            merged_change = None
+            merged_pct = None
         merged_rex = {
             'name': 'REX',
             'fund_count': rex_micro['fund_count'] + rex_shares['fund_count'],
             'total_aum': rex_micro['total_aum'] + rex_shares['total_aum'],
-            'aum_change': rex_micro['aum_change'] + rex_shares['aum_change'],
-            'aum_change_pct': (
-                (rex_micro['total_aum'] + rex_shares['total_aum'] - 
-                 rex_micro['aum_change'] - rex_shares['aum_change']) /
-                (rex_micro['total_aum'] + rex_shares['total_aum'] - 
-                 rex_micro['aum_change'] - rex_shares['aum_change'])
-                if (rex_micro['total_aum'] + rex_shares['total_aum'] - 
-                    rex_micro['aum_change'] - rex_shares['aum_change']) != 0
-                else 0
-            )
+            'aum_change': merged_change,
+            'aum_change_pct': merged_pct,
         }
         other_issuers.append(merged_rex)
     elif rex_micro:
@@ -168,8 +169,8 @@ def generate_report(
                     if previous_issuer.total_aum != 0 else 0
                 )
             else:
-                aum_change = 0
-                aum_change_pct = 0
+                aum_change = None
+                aum_change_pct = None
             
             # AUM-weighted average fee and total estimated annual revenue
             funds_with_fee = [f for f in current_issuer.funds if f.aum and f.expense_ratio]

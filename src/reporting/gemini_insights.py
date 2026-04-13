@@ -75,6 +75,10 @@ def _validate_items(items: list) -> list | None:
     return valid if valid else None
 
 
+PRIMARY_MODEL = 'gemini-2.5-flash'
+FALLBACK_MODEL = 'gemini-2.5-flash-lite'
+
+
 def _build_client():
     from google import genai
     from google.genai import types
@@ -84,6 +88,26 @@ def _build_client():
         temperature=0.2
     )
     return client, config
+
+
+def _generate_with_fallback(client, config, prompt):
+    """Try PRIMARY_MODEL first, fall back to FALLBACK_MODEL on 503/429."""
+    try:
+        return client.models.generate_content(
+            model=PRIMARY_MODEL,
+            contents=prompt,
+            config=config
+        )
+    except Exception as e:
+        error_str = str(e)
+        if '503' in error_str or '429' in error_str:
+            logger.warning(f"{PRIMARY_MODEL} unavailable, falling back to {FALLBACK_MODEL}")
+            return client.models.generate_content(
+                model=FALLBACK_MODEL,
+                contents=prompt,
+                config=config
+            )
+        raise
 
 
 def _date_context() -> str:
@@ -125,11 +149,7 @@ def get_etf_insights() -> list[dict] | None:
             f"or major market themes. Return exactly 5 objects in the array."
         )
 
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config=config
-        )
+        response = _generate_with_fallback(client, config, prompt)
 
         if not response.text:
             logger.warning("Gemini returned empty response for ETF insights")
@@ -148,13 +168,15 @@ def get_etf_insights() -> list[dict] | None:
         return None
 
 
-def get_stock_insights(ticker: str) -> list[dict] | None:
+def get_stock_insights(ticker: str, company: str | None = None) -> list[dict] | None:
     """
     Returns up to 3 notable news items about a specific stock/company from the past week.
     Each item has 'point', 'source_title', and 'source_url'.
     """
     if not GEMINI_API_KEY:
         return None
+
+    ticker_label = f"{ticker} ({company})" if company else ticker
 
     try:
         client, config = _build_client()
@@ -175,18 +197,14 @@ def get_stock_insights(ticker: str) -> list[dict] | None:
             f"EXAMPLE of a perfectly formatted response (2 items shown, return up to 3):\n"
             f'[{{"point": "{ticker} reported record quarterly earnings beating analyst estimates.", "source_title": "Bloomberg", "source_url": "https://bloomberg.com/news/example", "source_date": "2026-03-20"}}, '
             f'{{"point": "{ticker} announced a major partnership with a cloud provider.", "source_title": "CNBC", "source_url": "https://cnbc.com/2026/03/22/example.html", "source_date": "2026-03-22"}}]\n\n"'
-            f"TASK: Search for the most important news stories about {ticker} (the stock/company) "
+            f"TASK: Search for the most important news stories about the stock {ticker_label} "
             f"from the past week ({date_context}). "
             f"Focus on earnings, product launches, executive changes, regulatory news, "
             f"major partnerships, or anything significant that investors should know. "
             f"Return up to 3 objects (fewer if there are not 3 notable stories)."
         )
 
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config=config
-        )
+        response = _generate_with_fallback(client, config, prompt)
 
         insights = _parse_json_response(response.text)
         if not insights:
@@ -201,9 +219,15 @@ def get_stock_insights(ticker: str) -> list[dict] | None:
         return None
 
 
-def _fetch_batch_insights(tickers: list[str], client, config, date_context: str) -> list[dict]:
+def _fetch_batch_insights(tickers: list[dict], client, config, date_context: str) -> list[dict]:
     """Fetch insights for a batch of tickers in a single Gemini call."""
-    tickers_str = ", ".join(tickers)
+    ticker_labels = []
+    for t in tickers:
+        if t.get("company"):
+            ticker_labels.append(f"{t['ticker']} ({t['company']})")
+        else:
+            ticker_labels.append(t["ticker"])
+    tickers_str = ", ".join(ticker_labels)
 
     prompt = (
         f"RESPONSE FORMAT — CRITICAL: Your entire response must be ONLY a valid JSON object. "
@@ -223,8 +247,9 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
         f"EXAMPLE of a perfectly formatted response for 2 tickers:\n"
         f'{{"AAPL": [{{"point": "Apple launched Vision Pro in new markets.", "source_title": "Reuters", "source_url": "https://reuters.com/example", "source_date": "2026-03-20"}}], '
         f'"TSLA": [{{"point": "Tesla cut prices in Europe amid softening demand.", "source_title": "Bloomberg", "source_url": "https://bloomberg.com/example", "source_date": "2026-03-21"}}]}}\n\n'
-        f"TASK: For EACH of the following tickers: {tickers_str} — search thoroughly and return "
+        f"TASK: For EACH of the following stock tickers: {tickers_str} — search thoroughly and return "
         f"EXACTLY 3 news objects per ticker from the past week ({date_context}). "
+        f"Use the plain ticker symbol (e.g. \"COIN\", not \"COIN (Coinbase)\") as the JSON key. "
         f"3 items per ticker is the goal. Search hard to find 3 — broaden your search if needed: "
         f"include earnings, product launches, executive changes, regulatory news, partnerships, "
         f"analyst ratings, price targets, market moves, legal developments, or any event "
@@ -234,7 +259,7 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
     )
 
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-2.5-flash-lite',
         contents=prompt,
         config=config
     )
@@ -264,7 +289,8 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
     logger.debug(f"Batch response keys: {returned_keys}")
 
     results = []
-    for ticker in tickers:
+    for t in tickers:
+        ticker = t["ticker"]
         raw = parsed.get(ticker) or parsed.get(ticker.upper()) or parsed.get(ticker.lower())
         if not isinstance(raw, list):
             logger.warning(f"Batch: no entry for {ticker} — model returned keys: {returned_keys}")
@@ -277,10 +303,11 @@ def _fetch_batch_insights(tickers: list[str], client, config, date_context: str)
     return results
 
 
-def get_all_stock_insights(tickers: list[str], batch_size: int = 3) -> list[dict]:
+def get_all_stock_insights(tickers: list[dict], batch_size: int = 3) -> list[dict]:
     """
     Returns a list of {ticker, insights} dicts for each ticker in the watchlist.
-    Tickers are processed in batches of batch_size (default 5) to balance
+    Each ticker is a dict with 'ticker' and optional 'company' keys.
+    Tickers are processed in batches of batch_size (default 3) to balance
     quality and API call efficiency. Failed batches are skipped with a warning.
     """
     if not tickers or not GEMINI_API_KEY:
@@ -295,7 +322,7 @@ def get_all_stock_insights(tickers: list[str], batch_size: int = 3) -> list[dict
     for i, chunk in enumerate(chunks):
         if i > 0:
             time.sleep(13)
-        tickers_str = ", ".join(chunk)
+        tickers_str = ", ".join(t["ticker"] for t in chunk)
         logger.info(f"Batch {i + 1}/{len(chunks)}: fetching insights for {tickers_str}...")
         for attempt in range(2):
             try:

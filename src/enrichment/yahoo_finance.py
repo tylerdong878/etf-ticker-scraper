@@ -174,7 +174,8 @@ def enrich_funds(funds: list[ETFund]) -> list[ETFund]:
             fund.nav = cached_data.get("nav")
             fund.volume = cached_data.get("volume")
             fund.inception_date = cached_data.get("inception_date")
-            fund.expense_ratio = cached_data.get("expense_ratio")
+            if not fund.expense_ratio:
+                fund.expense_ratio = cached_data.get("expense_ratio")
             if not fund.aum:
                 total_assets = cached_data.get("total_assets")
                 if total_assets:
@@ -192,7 +193,8 @@ def enrich_funds(funds: list[ETFund]) -> list[ETFund]:
         fund.nav = data["nav"]
         fund.volume = data["volume"]
         fund.inception_date = data["inception_date"]
-        fund.expense_ratio = data.get("expense_ratio")
+        if not fund.expense_ratio:
+            fund.expense_ratio = data.get("expense_ratio")
         if not fund.aum:
             total_assets = data.get("total_assets")
             if total_assets:

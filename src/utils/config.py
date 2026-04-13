@@ -71,7 +71,21 @@ RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL", "")
 
 # Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-WATCHLIST_TICKERS = [t.strip().upper() for t in os.getenv("WATCHLIST_TICKERS", "").split(",") if t.strip()]
+def _parse_watchlist_tickers(raw: str) -> list[dict]:
+    """Parse 'COIN:Coinbase,HOOD:Robinhood,NVDA' into structured list."""
+    result = []
+    for entry in raw.split(","):
+        entry = entry.strip()
+        if not entry:
+            continue
+        if ":" in entry:
+            ticker, company = entry.split(":", 1)
+            result.append({"ticker": ticker.strip().upper(), "company": company.strip()})
+        else:
+            result.append({"ticker": entry.upper(), "company": None})
+    return result
+
+WATCHLIST_TICKERS = _parse_watchlist_tickers(os.getenv("WATCHLIST_TICKERS", ""))
 
 # Directory paths
 DATA_DIR = BASE_DIR / "data"

@@ -502,7 +502,6 @@
 
             <div class="table-subheader gains">Top Gainers</div>
             {% if top_gainers %}
-            {% if is_email_body %}
             <table class="data-table">
                 <thead><tr><th>Ticker</th><th>Issuer</th><th style="text-align:right;">Prev</th><th style="text-align:right;">Current</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
                 <tbody>
@@ -518,29 +517,10 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
-            <table class="data-table">
-                <thead><tr><th>Ticker</th><th>Name</th><th>Issuer</th><th style="text-align:right;">Prev AUM</th><th style="text-align:right;">AUM</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
-                <tbody>
-                    {% for m in top_gainers %}
-                    <tr>
-                        <td class="ticker-cell">{{ m.ticker }}</td>
-                        <td>{{ m.name }}</td>
-                        <td class="issuer-cell">{{ m.issuer }}</td>
-                        <td style="text-align:right;" class="num">{{ m.prev_aum | compact_aum }}</td>
-                        <td style="text-align:right;" class="num">{{ m.current_aum | compact_aum }}</td>
-                        <td style="text-align:right;" class="num positive">+{{ m.change | compact_aum }}</td>
-                        <td style="text-align:right;" class="num positive">+{{ "{:.2f}".format(m.change_pct * 100) }}%</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
             {% endif %}
 
             <div class="table-subheader losses">Top Losers</div>
             {% if top_losers %}
-            {% if is_email_body %}
             <table class="data-table">
                 <thead><tr><th>Ticker</th><th>Issuer</th><th style="text-align:right;">Prev</th><th style="text-align:right;">Current</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
                 <tbody>
@@ -556,24 +536,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
-            <table class="data-table">
-                <thead><tr><th>Ticker</th><th>Name</th><th>Issuer</th><th style="text-align:right;">Prev AUM</th><th style="text-align:right;">AUM</th><th style="text-align:right;">Change</th><th style="text-align:right;">%</th></tr></thead>
-                <tbody>
-                    {% for m in top_losers %}
-                    <tr>
-                        <td class="ticker-cell">{{ m.ticker }}</td>
-                        <td>{{ m.name }}</td>
-                        <td class="issuer-cell">{{ m.issuer }}</td>
-                        <td style="text-align:right;" class="num">{{ m.prev_aum | compact_aum }}</td>
-                        <td style="text-align:right;" class="num">{{ m.current_aum | compact_aum }}</td>
-                        <td style="text-align:right;" class="num negative">{{ m.change | compact_aum }}</td>
-                        <td style="text-align:right;" class="num negative">{{ "{:.2f}".format(m.change_pct * 100) }}%</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
             {% endif %}
 
             {% else %}
@@ -604,12 +566,17 @@
                         <td class="issuer-name">{{ issuer.name }}</td>
                         <td style="text-align:right;" class="num">{{ issuer.fund_count }}</td>
                         <td style="text-align:right;" class="num">{{ issuer.total_aum | compact_aum }}</td>
+                        {% if issuer.aum_change is none %}
+                        <td style="text-align:right;" class="num neutral">—</td>
+                        <td style="text-align:right;" class="num neutral">—</td>
+                        {% else %}
                         <td style="text-align:right;" class="num {% if issuer.aum_change > 0 %}positive{% elif issuer.aum_change < 0 %}negative{% else %}neutral{% endif %}">
                             {% if issuer.aum_change > 0 %}+{% endif %}{{ issuer.aum_change | compact_aum }}
                         </td>
                         <td style="text-align:right;" class="num {% if issuer.aum_change_pct > 0 %}positive{% elif issuer.aum_change_pct < 0 %}negative{% else %}neutral{% endif %}">
                             {% if issuer.aum_change_pct > 0 %}+{% endif %}{{ "{:.2f}".format(issuer.aum_change_pct * 100) }}%
                         </td>
+                        {% endif %}
                         <td style="text-align:right;" class="num">
                             {% if issuer.avg_fee %}{{ "{:.2f}".format(issuer.avg_fee * 100) }}%{% else %}—{% endif %}
                         </td>
