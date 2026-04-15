@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Issuer configuration - organized by scraping method
 
-# Issuers available on stockanalysis.com (17 issuers)
+# Issuers available on stockanalysis.com (16 issuers)
 STOCKANALYSIS_ISSUERS = {
     "proshares": "https://stockanalysis.com/etf/provider/proshares/",
     "direxion": "https://stockanalysis.com/etf/provider/direxion/",
@@ -22,7 +22,6 @@ STOCKANALYSIS_ISSUERS = {
     "yieldmax": "https://stockanalysis.com/etf/provider/yieldmax/",
     "neos": "https://stockanalysis.com/etf/provider/neos/",
     "roundhill": "https://stockanalysis.com/etf/provider/roundhill/",
-    "rex-microsectors": "https://stockanalysis.com/etf/provider/rex-microsectors/",
     "tuttle-capital-management": "https://stockanalysis.com/etf/provider/tuttle-capital-management/",
     "defiance": "https://stockanalysis.com/etf/provider/defiance/",
     "simplify": "https://stockanalysis.com/etf/provider/simplify/",
@@ -35,11 +34,12 @@ STOCKANALYSIS_ISSUERS = {
     "aptus-capital-advisors": "https://stockanalysis.com/etf/provider/aptus-capital-advisors/",
 }
 
-# Issuers scraped from their own websites (7 issuers)
+# Issuers scraped from their own websites (8 issuers)
 DIRECT_ISSUERS = {
     "kurv": "https://www.kurvinvest.com/etfs",
     "volatility-shares": "https://www.volatilityshares.com/etf-product-list.php",
     "rex-shares": "https://www.rexshares.com/home/all-funds/",
+    "microsectors": "https://www.microsectors.com",
     "leverage-shares": "https://leverageshares.com/us/all-etfs/",
     "bmo-max": "https://www.maxetns.com/",
     "amplify": "https://amplifyetfs.com",

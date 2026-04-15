@@ -499,6 +499,98 @@ class LeverageSharesScraper:
             return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
 
 
+class MicroSectorsScraper:
+    """Scraper for MicroSectors ETNs from https://www.microsectors.com"""
+
+    def __init__(self):
+        self.url = DIRECT_ISSUERS["microsectors"]
+        self.issuer_slug = "rex-microsectors"
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def scrape(self) -> IssuerSnapshot:
+        """
+        Scrape MicroSectors ETNs using plain requests (no browser needed).
+
+        Page structure:
+          <div class="item">
+            <a href="/fang">
+              <div class="suite-name">Fang+</div>
+              <div class="products">
+                <div class="product">
+                  <div class="product-symbol">FNGU</div>
+                  <div class="product-description">3X Leveraged Exposure</div>
+                </div>
+                ...
+              </div>
+            </a>
+          </div>
+
+        Returns:
+            IssuerSnapshot with all MicroSectors ETN funds
+        """
+        import requests
+
+        logger.info(f"Scraping {self.issuer_slug}: {self.url}")
+
+        try:
+            resp = requests.get(self.url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp.raise_for_status()
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+
+            funds = []
+            seen: set[str] = set()
+
+            for item in soup.find_all("div", class_="item"):
+                suite_name_div = item.find("div", class_="suite-name")
+                suite_name = suite_name_div.get_text(strip=True) if suite_name_div else ""
+
+                for product in item.find_all("div", class_="product"):
+                    try:
+                        sym_div = product.find("div", class_="product-symbol")
+                        desc_div = product.find("div", class_="product-description")
+
+                        if not sym_div:
+                            continue
+
+                        ticker = sym_div.get_text(strip=True).upper()
+                        if not ticker or ticker in seen:
+                            continue
+
+                        description = desc_div.get_text(strip=True) if desc_div else ""
+                        name = f"MicroSectors {suite_name} {description} ETNs".strip()
+
+                        seen.add(ticker)
+                        funds.append(ETFund(
+                            ticker=ticker,
+                            name=name,
+                            issuer=self.issuer_slug,
+                            aum=None,
+                        ))
+
+                    except Exception as e:
+                        logger.warning(f"Error parsing {self.issuer_slug} product: {e}")
+                        continue
+
+            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds (no AUM data)")
+
+            return IssuerSnapshot(
+                issuer_slug=self.issuer_slug,
+                total_funds=len(funds),
+                total_aum=0,
+                funds=funds,
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to scrape {self.issuer_slug}: {e}")
+            return IssuerSnapshot(issuer_slug=self.issuer_slug, total_funds=0, total_aum=0, funds=[])
+
+
 class BmoMaxScraper:
     """Scraper for BMO MAX ETNs from https://www.maxetns.com/"""
 
@@ -883,6 +975,7 @@ def scrape_all_direct() -> dict[str, IssuerSnapshot]:
         KurvScraper(),
         VolatilitySharesScraper(),
         RexSharesScraper(),
+        MicroSectorsScraper(),
         LeverageSharesScraper(),
         BmoMaxScraper(),
         AmplifyScraper(),
