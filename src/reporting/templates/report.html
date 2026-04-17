@@ -127,6 +127,16 @@
 
         .insight-source a:hover { text-decoration: underline; }
 
+        /* ── Insights error ── */
+        .insights-error {
+            padding: 10px 14px;
+            background: #fff8f0;
+            border: 1px solid #fed7aa;
+            border-radius: 5px;
+            color: #92400e;
+            font-size: 12px;
+        }
+
         /* ── Watchlist ── */
         .watchlist-stock { margin-bottom: 20px; }
 
@@ -405,6 +415,12 @@
                 {% endfor %}
             </ul>
         </div>
+        {% elif etf_insights_error %}
+        <div class="section">
+            <div class="section-label">Market Intelligence</div>
+            <div class="section-title">ETF Industry Highlights</div>
+            <div class="insights-error">Gemini was unable to retrieve ETF industry highlights for this report.</div>
+        </div>
         {% endif %}
 
         <!-- Watchlist -->
@@ -427,6 +443,12 @@
                 </ul>
             </div>
             {% endfor %}
+        </div>
+        {% elif stock_insights_error %}
+        <div class="section">
+            <div class="section-label">Watchlist</div>
+            <div class="section-title">Company Briefs</div>
+            <div class="insights-error">Gemini was unable to retrieve company briefs for this report.</div>
         </div>
         {% endif %}
 

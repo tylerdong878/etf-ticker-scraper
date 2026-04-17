@@ -275,6 +275,9 @@ def generate_report(
     if stock_insights is None:
         stock_insights = get_all_stock_insights(WATCHLIST_TICKERS) if WATCHLIST_TICKERS else []
 
+    etf_insights_error = etf_insights is None
+    stock_insights_error = bool(WATCHLIST_TICKERS) and not stock_insights
+
     # Render template
     html_content = template.render(
         report_date=current_snapshot.date,
@@ -290,6 +293,8 @@ def generate_report(
         fund_list=fund_list,
         etf_insights=etf_insights,
         stock_insights=stock_insights,
+        etf_insights_error=etf_insights_error,
+        stock_insights_error=stock_insights_error,
         generation_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
         is_email_body=is_email_body
     )
