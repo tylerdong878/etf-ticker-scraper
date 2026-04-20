@@ -681,6 +681,19 @@ class BmoMaxScraper:
 class AmplifyScraper:
     """Scraper for Amplify ETFs from https://amplifyetfs.com using plain requests."""
 
+    _HEADERS = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": "https://amplifyetfs.com/",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+    }
+    _MONTHLY_CSV = "https://amplifyetfs.com/wp-content/uploads/feeds/AmplifyWeb.40XL.XL_Monthly.csv"
+    _YIELD_CSV = "https://amplifyetfs.com/wp-content/uploads/feeds/AmplifyWeb.40XL.Amplify_Uploader_-_Confidential.csv"
+
     def __init__(self):
         self.url = DIRECT_ISSUERS["amplify"]
         self.issuer_slug = "amplify"
@@ -690,6 +703,49 @@ class AmplifyScraper:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
+
+    def _fetch_returns(self) -> dict:
+        """Fetch 1-year NAV returns from monthly performance CSV."""
+        import requests
+        import csv
+        import io
+        returns = {}
+        try:
+            r = requests.get(self._MONTHLY_CSV, headers=self._HEADERS, timeout=30)
+            r.raise_for_status()
+            for row in csv.DictReader(io.StringIO(r.text)):
+                ticker_col = row.get("Fund Ticker", "").strip()
+                if " NAV" not in ticker_col:
+                    continue
+                ticker = ticker_col.replace(" NAV", "").strip()
+                val = row.get("1 Year", "").strip()
+                try:
+                    returns[ticker] = float(val) / 100
+                except ValueError:
+                    pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch Amplify returns CSV: {e}")
+        return returns
+
+    def _fetch_yields(self) -> dict:
+        """Fetch distribution yields from uploader CSV."""
+        import requests
+        import csv
+        import io
+        yields = {}
+        try:
+            r = requests.get(self._YIELD_CSV, headers=self._HEADERS, timeout=30)
+            r.raise_for_status()
+            for row in csv.DictReader(io.StringIO(r.text)):
+                ticker = row.get("Ticker", "").strip()
+                val = row.get("Distribution_Yield", "").strip().replace("%", "")
+                try:
+                    yields[ticker] = float(val) / 100
+                except ValueError:
+                    pass
+        except Exception as e:
+            logger.warning(f"Failed to fetch Amplify yields CSV: {e}")
+        return yields
 
     def scrape(self) -> IssuerSnapshot:
         """
@@ -702,17 +758,21 @@ class AmplifyScraper:
             </a>
           </li>
 
-        No AUM data is available on the listing page (loads via JS from CSV feeds).
+        Returns and yields come from CSV feeds published by Amplify.
+        AUM/NAV/volume are enriched downstream via yfinance.
         """
         import requests
 
         logger.info(f"Scraping {self.issuer_slug}: {self.url}")
 
         try:
-            resp = requests.get(self.url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            resp = requests.get(self.url, headers=self._HEADERS, timeout=30)
             resp.raise_for_status()
 
             soup = BeautifulSoup(resp.text, "html.parser")
+
+            returns = self._fetch_returns()
+            yields = self._fetch_yields()
 
             funds = []
             seen = set()
@@ -734,7 +794,6 @@ class AmplifyScraper:
 
                     # Full text is "<b>TICKER</b> - Fund Name"
                     full_text = span.get_text(separator=" ", strip=True)
-                    # Strip "TICKER - " prefix to get name
                     parts = full_text.split(" - ", 1)
                     name = parts[1].strip() if len(parts) == 2 else full_text
 
@@ -744,13 +803,15 @@ class AmplifyScraper:
                         name=name,
                         issuer=self.issuer_slug,
                         aum=None,
+                        return_1y=returns.get(ticker),
+                        div_yield=yields.get(ticker),
                     ))
 
                 except Exception as e:
                     logger.warning(f"Error parsing {self.issuer_slug} row: {e}")
                     continue
 
-            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds (no AUM data)")
+            logger.info(f"Scraped {self.issuer_slug}: {len(funds)} funds")
             return IssuerSnapshot(
                 issuer_slug=self.issuer_slug,
                 total_funds=len(funds),
